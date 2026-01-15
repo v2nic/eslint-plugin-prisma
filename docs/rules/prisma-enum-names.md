@@ -1,4 +1,4 @@
-# Enforce Prisma enum naming and mapping conventions (`prisma/prisma-enum-names`)
+# Enforce Prisma enum naming and mapping conventions (`@v2nic/prisma/prisma-enum-names`)
 
 <!-- end auto-generated rule header -->
 

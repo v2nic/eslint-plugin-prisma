@@ -1,4 +1,4 @@
-# Disallow snake_case identifiers and keys in TypeScript (`prisma/no-snake-case-in-ts`)
+# Disallow snake_case identifiers and keys in TypeScript (`@v2nic/prisma/no-snake-case-in-ts`)
 
 <!-- end auto-generated rule header -->
 

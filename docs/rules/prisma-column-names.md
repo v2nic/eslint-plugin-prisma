@@ -1,4 +1,4 @@
-# Enforce camelCase Prisma fields mapped to snake_case columns (`prisma/prisma-column-names`)
+# Enforce camelCase Prisma fields mapped to snake_case columns (`@v2nic/prisma/prisma-column-names`)
 
 <!-- end auto-generated rule header -->
 

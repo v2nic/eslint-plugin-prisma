@@ -1,6 +1,4 @@
-# Disallow the use of potentially unsafe Prisma methods (`prisma/no-unsafe`)
-
-💼 This rule is enabled in the ✅ `recommended` config.
+# Disallow the use of potentially unsafe Prisma methods (`@v2nic/prisma/no-unsafe`)
 
 <!-- end auto-generated rule header -->
 

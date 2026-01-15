@@ -1,4 +1,4 @@
-# Require models to map to snake_case table names via @@map (`prisma/prisma-table-names`)
+# Require models to map to snake_case table names via @@map (`@v2nic/prisma/prisma-table-names`)
 
 <!-- end auto-generated rule header -->
 
