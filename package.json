@@ -28,6 +28,7 @@
     "compile": "tsc --project tsconfig.json --noEmit",
     "build": "tsc --project tsconfig.build.json",
     "format": "prettier --check .",
+    "check:prisma-client-snake-case": "node ./scripts/check-prisma-client-snake-case.js",
     "lint": "npm-run-all \"lint:*\"",
     "lint:docs": "markdownlint \"**/*.md\"",
     "lint:eslint-docs": "npm-run-all \"update:eslint-docs -- --check\"",
@@ -35,6 +36,9 @@
     "update:eslint-docs": "npm run build && eslint-doc-generator"
   },
   "dependencies": {
+    "@prisma/dmmf": "^7.2.0",
+    "@prisma/internals": "^7.2.0",
+    "minimatch": "^5.1.6",
     "@typescript-eslint/types": "^7.18.0",
     "@typescript-eslint/utils": "^7.18.0"
   },
@@ -43,7 +47,9 @@
   },
   "devDependencies": {
     "@prisma/client": "^7.2.0",
+    "@types/minimatch": "^5.1.2",
     "@types/jest": "^29.5.14",
+    "@types/eslint": "^8.56.10",
     "@types/node": "^20.17.16",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",

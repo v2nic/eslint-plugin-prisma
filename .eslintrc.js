@@ -76,6 +76,12 @@ module.exports = {
       },
     },
     {
+      files: ['scripts/**/*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+    {
       files: ['*.json'],
       extends: ['plugin:jsonc/recommended-with-jsonc', 'plugin:jsonc/prettier', 'plugin:prettier/recommended'],
       rules: {

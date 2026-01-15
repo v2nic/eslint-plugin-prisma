@@ -61,9 +61,13 @@ Then configure the rules you want to use under the rules section:
 ✅ Set in the `recommended` configuration.\
 💡 Manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
 
-| Name                                           | Description                                               | 💼  | 💡  |
-| :--------------------------------------------- | :-------------------------------------------------------- | :-- | :-- |
-| [no-unsafe](docs/rules/no-unsafe.md)           | Disallow the use of potentially unsafe Prisma methods     | ✅  |     |
-| [require-select](docs/rules/require-select.md) | Forces explicit selection of all fields in Prisma queries | ✅  | 💡  |
+| Name                                                     | Description                                                  | 💼  | 💡  |
+| :------------------------------------------------------- | :----------------------------------------------------------- | :-- | :-- |
+| [no-snake-case-in-ts](docs/rules/no-snake-case-in-ts.md) | Disallow snake_case identifiers and keys in TypeScript       |     |     |
+| [no-unsafe](docs/rules/no-unsafe.md)                     | Disallow the use of potentially unsafe Prisma methods        | ✅  |     |
+| [prisma-column-names](docs/rules/prisma-column-names.md) | Enforce camelCase Prisma fields mapped to snake_case columns |     |     |
+| [prisma-enum-names](docs/rules/prisma-enum-names.md)     | Enforce Prisma enum naming and mapping conventions           |     |     |
+| [prisma-table-names](docs/rules/prisma-table-names.md)   | Require models to map to snake_case table names via @@map    |     |     |
+| [require-select](docs/rules/require-select.md)           | Forces explicit selection of all fields in Prisma queries    | ✅  | 💡  |
 
 <!-- end auto-generated rules list -->
