@@ -1,6 +1,6 @@
 {
-  "name": "eslint-plugin-prisma",
-  "version": "1.0.1",
+  "name": "@v2nic/eslint-plugin-prisma",
+  "version": "1.0.2",
   "description": "ESLint plugin ensuring best practices and code quality for Prisma with TypeScript",
   "keywords": [
     "Prisma",
@@ -10,10 +10,13 @@
   ],
   "author": "Lucas Grégoire",
   "license": "MIT",
-  "url": "https://github.com/lucas-gregoire/eslint-plugin-prisma#readme",
+  "url": "https://github.com/v2nic/eslint-plugin-prisma#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lucas-gregoire/eslint-plugin-prisma"
+    "url": "https://github.com/v2nic/eslint-plugin-prisma"
+  },
+  "bugs": {
+    "url": "https://github.com/v2nic/eslint-plugin-prisma/issues"
   },
   "main": "./lib/index.js",
   "exports": "./lib/index.js",

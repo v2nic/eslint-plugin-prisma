@@ -14,10 +14,10 @@ You'll first need to install [ESLint](https://eslint.org/):
 npm install eslint --save-dev
 ```
 
-Next, install `eslint-plugin-prisma`:
+Next, install `@v2nic/eslint-plugin-prisma`:
 
 ```sh
-npm install eslint-plugin-prisma --save-dev
+npm install @v2nic/eslint-plugin-prisma --save-dev
 ```
 
 ## Usage
@@ -26,16 +26,16 @@ Load the `recommended` configuration:
 
 ```json
 {
-  "extends": ["plugin:eslint-plugin-prisma/recommended"]
+  "extends": ["plugin:@v2nic/prisma/recommended"]
 }
 ```
 
-Add `prisma` to the plugins section of your `.eslintrc` configuration file. You can omit the `eslint-plugin-` prefix.
+Add `@v2nic/prisma` to the plugins section of your `.eslintrc` configuration file. You can omit the `eslint-plugin-` prefix.
 Then configure the rules you want to use under the rules section:
 
 ```json
 {
-  "plugins": ["prisma"],
+  "plugins": ["@v2nic/prisma"],
   "rules": {
     "prisma/no-unsafe": "error",
     "prisma/require-select": "error"
@@ -57,17 +57,15 @@ Then configure the rules you want to use under the rules section:
 
 <!-- begin auto-generated rules list -->
 
-💼 Configurations enabled in.\
-✅ Set in the `recommended` configuration.\
 💡 Manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
 
-| Name                                                     | Description                                                  | 💼  | 💡  |
-| :------------------------------------------------------- | :----------------------------------------------------------- | :-- | :-- |
-| [no-snake-case-in-ts](docs/rules/no-snake-case-in-ts.md) | Disallow snake_case identifiers and keys in TypeScript       |     |     |
-| [no-unsafe](docs/rules/no-unsafe.md)                     | Disallow the use of potentially unsafe Prisma methods        | ✅  |     |
-| [prisma-column-names](docs/rules/prisma-column-names.md) | Enforce camelCase Prisma fields mapped to snake_case columns |     |     |
-| [prisma-enum-names](docs/rules/prisma-enum-names.md)     | Enforce Prisma enum naming and mapping conventions           |     |     |
-| [prisma-table-names](docs/rules/prisma-table-names.md)   | Require models to map to snake_case table names via @@map    |     |     |
-| [require-select](docs/rules/require-select.md)           | Forces explicit selection of all fields in Prisma queries    | ✅  | 💡  |
+| Name                                                     | Description                                                  | 💡  |
+| :------------------------------------------------------- | :----------------------------------------------------------- | :-- |
+| [no-snake-case-in-ts](docs/rules/no-snake-case-in-ts.md) | Disallow snake_case identifiers and keys in TypeScript       |     |
+| [no-unsafe](docs/rules/no-unsafe.md)                     | Disallow the use of potentially unsafe Prisma methods        |     |
+| [prisma-column-names](docs/rules/prisma-column-names.md) | Enforce camelCase Prisma fields mapped to snake_case columns |     |
+| [prisma-enum-names](docs/rules/prisma-enum-names.md)     | Enforce Prisma enum naming and mapping conventions           |     |
+| [prisma-table-names](docs/rules/prisma-table-names.md)   | Require models to map to snake_case table names via @@map    |     |
+| [require-select](docs/rules/require-select.md)           | Forces explicit selection of all fields in Prisma queries    | 💡  |
 
 <!-- end auto-generated rules list -->
