@@ -12,37 +12,37 @@ const ruleTester = new RuleTester({
 ruleTester.run('no-snake-case-in-ts', noSnakeCaseInTs, {
   valid: [
     {
-      code: 'const wallboxChargerId = "123"; const x = { wallboxChargerId };',
+      code: 'const exampleFieldId = "123"; const x = { exampleFieldId };',
       filename: 'src/server/example.ts',
     },
     {
-      code: 'const data = { wallbox_charger_id: "123" };',
+      code: 'const data = { example_field_id: "123" };',
       filename: 'src/server/example.ts',
-      options: [{ allowedSnakeCaseKeys: ['wallbox_charger_id'] }],
+      options: [{ allowedSnakeCaseKeys: ['example_field_id'] }],
     },
     {
-      code: 'const wallbox_charger_id = "123";',
+      code: 'const example_field_id = "123";',
       filename: 'src/generated/client.ts',
       options: [{ allowedFileGlobs: ['**/generated/**'] }],
     },
     {
-      code: 'const value = process.env.wallbox_charger_id;',
+      code: 'const value = process.env.example_field_id;',
       filename: 'src/server/example.ts',
     },
   ],
   invalid: [
     {
-      code: 'const wallbox_charger_id = "123";',
+      code: 'const example_field_id = "123";',
       filename: 'src/server/example.ts',
       errors: [{ messageId: 'noSnakeCase' }],
     },
     {
-      code: 'const x = { wallbox_charger_id: "123" };',
+      code: 'const x = { example_field_id: "123" };',
       filename: 'src/server/example.ts',
       errors: [{ messageId: 'noSnakeCase' }],
     },
     {
-      code: 'const x = { "wallbox_charger_id": "123" };',
+      code: 'const x = { "example_field_id": "123" };',
       filename: 'src/server/example.ts',
       errors: [{ messageId: 'noSnakeCase' }],
     },

@@ -1,11 +1,11 @@
 import { Linter } from 'eslint';
-import { prismaColumnNames } from '../../src/rules/prisma-column-names';
+import { schemaFieldNameStyle } from '../../src/rules/schema-field-name-style';
 import { wrapPrismaSchemaForLint } from '../../src/utils/prisma-schema';
 
 const linter = new Linter();
 (linter as unknown as { defineRule: (...args: unknown[]) => void }).defineRule(
-  'prisma/prisma-column-names',
-  prismaColumnNames as unknown,
+  'prisma/schema-field-name-style',
+  schemaFieldNameStyle as unknown,
 );
 
 const SCHEMA_HEADER = `
@@ -21,12 +21,15 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
-const verify = (schema: string, options?: { allowlist?: string[] }) =>
+const verify = (
+  schema: string,
+  options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case'; allowlist?: string[] },
+) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {
       rules: {
-        'prisma/prisma-column-names': ['error', options ?? {}],
+        'prisma/schema-field-name-style': ['error', options ?? {}],
       },
       parserOptions: {
         ecmaVersion: 2020,
@@ -39,47 +42,50 @@ const verify = (schema: string, options?: { allowlist?: string[] }) =>
     },
   );
 
-describe('prisma-column-names', () => {
-  it('accepts camelCase fields mapped to snake_case columns', () => {
+describe('schema-field-name-style', () => {
+  it('accepts camel_case fields by default', () => {
     const messages = verify(`
-model WallboxSchedule {
+model ExampleModel {
   id String @id @map("id")
-  wallboxChargerId String @map("wallbox_charger_id")
+  exampleFieldId String
 }
 `);
     expect(messages).toHaveLength(0);
   });
 
-  it('reports snake_case field names', () => {
+  it('reports non-matching field styles', () => {
     const messages = verify(`
-model WallboxSchedule {
+model ExampleModel {
   id String @id @map("id")
-  wallbox_charger_id String
+  example_field_id String
 }
 `);
     expect(messages).toHaveLength(1);
-    expect(messages[0].ruleId).toBe('prisma/prisma-column-names');
+    expect(messages[0].ruleId).toBe('prisma/schema-field-name-style');
   });
 
-  it('reports missing @map for camelCase fields', () => {
-    const messages = verify(`
-model WallboxSchedule {
-  id String @id @map("id")
-  wallboxChargerId String
-}
-`);
-    expect(messages).toHaveLength(1);
-  });
-
-  it('allows allowlisted snake_case fields', () => {
+  it('accepts pascal_case when configured', () => {
     const messages = verify(
       `
-model WallboxSchedule {
+model ExampleModel {
   id String @id @map("id")
-  wallbox_charger_id String
+  ExampleFieldId String
 }
 `,
-      { allowlist: ['wallbox_charger_id'] },
+      { style: 'pascal_case', allowlist: ['id'] },
+    );
+    expect(messages).toHaveLength(0);
+  });
+
+  it('allows allowlisted fields', () => {
+    const messages = verify(
+      `
+model ExampleModel {
+  id String @id @map("id")
+  example_field_id String
+}
+`,
+      { allowlist: ['example_field_id'] },
     );
     expect(messages).toHaveLength(0);
   });

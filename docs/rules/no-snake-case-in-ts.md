@@ -11,17 +11,17 @@ Prevents snake_case identifiers and object keys in TypeScript application code t
 ### Incorrect
 
 ```ts
-const wallbox_charger_id = '123';
+const example_field_id = '123';
 ```
 
 ```ts
-const payload = { wallbox_charger_id: '123' };
+const payload = { example_field_id: '123' };
 ```
 
 ### Correct
 
 ```ts
-const wallboxChargerId = '123';
+const exampleFieldId = '123';
 ```
 
 ## Options

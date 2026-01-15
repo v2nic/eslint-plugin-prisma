@@ -2,41 +2,52 @@ import { createRule } from '../utils/create-rule';
 import {
   applyLineOffset,
   getPrismaSchemaContext,
-  isCamelCase,
-  isSnakeCase,
+  isNamingStyle,
+  type NamingStyle,
   toReportLocation,
 } from '../utils/prisma-schema';
 
-type Options = [{ allowlist?: readonly string[] }?];
+const STYLE_CHOICES = ['snake_case', 'camel_case', 'pascal_case', 'screaming_snake_case'] as const;
+
+type Options = [{ style?: NamingStyle; allowlist?: readonly string[]; ignoreModels?: readonly string[] }?];
 
 type MessageIds = 'invalidFieldName';
 
-const DEFAULT_OPTIONS = [{ allowlist: [] }] as const;
+const DEFAULT_OPTIONS = [{ style: 'camel_case', allowlist: [], ignoreModels: [] }] as const;
 
-export const prismaColumnNames = createRule<Options, MessageIds>({
-  name: 'prisma-column-names',
+export const schemaFieldNameStyle = createRule<Options, MessageIds>({
+  name: 'schema-field-name-style',
   defaultOptions: DEFAULT_OPTIONS,
   meta: {
     type: 'problem',
     docs: {
-      description: 'Enforce camelCase Prisma fields mapped to snake_case columns',
+      description: 'Enforce schema field names to follow the configured TypeScript style',
     },
     schema: [
       {
         type: 'object',
         properties: {
+          style: {
+            type: 'string',
+            enum: [...STYLE_CHOICES],
+            default: DEFAULT_OPTIONS[0].style,
+          },
           allowlist: {
             type: 'array',
             items: { type: 'string' },
             default: [...DEFAULT_OPTIONS[0].allowlist],
+          },
+          ignoreModels: {
+            type: 'array',
+            items: { type: 'string' },
+            default: [...DEFAULT_OPTIONS[0].ignoreModels],
           },
         },
         additionalProperties: false,
       },
     ],
     messages: {
-      invalidFieldName:
-        'Prisma model field names must be camelCase. Use `@map("...")` to map to a snake_case DB column.',
+      invalidFieldName: 'Schema field names must follow the configured style.',
     },
   },
   create(context) {
@@ -45,12 +56,13 @@ export const prismaColumnNames = createRule<Options, MessageIds>({
       return {};
     }
 
-    const { allowlist = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
+    const { style = 'camel_case', allowlist = [], ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
 
     return {
       Program() {
         const { dmmf, locator, lineOffset } = getPrismaSchemaContext(context.getSourceCode().text);
         const node = context.getSourceCode().ast;
+
         const reportField = (modelName: string, fieldName: string) => {
           const location = locator.modelFieldLocations.get(modelName)?.get(fieldName);
           if (!location) {
@@ -62,28 +74,17 @@ export const prismaColumnNames = createRule<Options, MessageIds>({
         };
 
         dmmf.datamodel.models.forEach((model) => {
-          if (model.isGenerated) {
+          if (model.isGenerated || ignoreModels.includes(model.name)) {
             return;
           }
           model.fields.forEach((field) => {
-            if (field.kind !== 'scalar' && field.kind !== 'enum') {
+            if (field.kind === 'unsupported') {
               return;
             }
             if (allowlist.includes(field.name)) {
               return;
             }
-            if (!isCamelCase(field.name)) {
-              reportField(model.name, field.name);
-              return;
-            }
-            const mapValue = locator.modelFieldMapValues.get(model.name)?.get(field.name);
-            if (!mapValue) {
-              if (!isSnakeCase(field.name)) {
-                reportField(model.name, field.name);
-              }
-              return;
-            }
-            if (!isSnakeCase(mapValue)) {
+            if (!isNamingStyle(field.name, style)) {
               reportField(model.name, field.name);
             }
           });

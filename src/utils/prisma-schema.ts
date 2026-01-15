@@ -19,8 +19,11 @@ export type SchemaLocator = {
   modelMapLocations: Map<string, SourceLocation>;
   modelMapValues: Map<string, string>;
   modelFieldMapValues: Map<string, Map<string, string>>;
+  modelFieldMapLocations: Map<string, Map<string, SourceLocation>>;
   enumLocations: Map<string, SourceLocation>;
   enumValueLocations: Map<string, Map<string, SourceLocation>>;
+  enumValueMapValues: Map<string, Map<string, string>>;
+  enumValueMapLocations: Map<string, Map<string, SourceLocation>>;
   enumMapLocations: Map<string, SourceLocation>;
   enumMapValues: Map<string, string>;
 };
@@ -31,6 +34,8 @@ export type PrismaSchemaContext = {
   locator: SchemaLocator;
   lineOffset: number;
 };
+
+export type NamingStyle = 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case';
 
 export const toReportLocation = (location: SourceLocation): ReportLocation => ({
   start: location,
@@ -44,7 +49,7 @@ export const applyLineOffset = (location: SourceLocation, lineOffset: number): S
 
 export const wrapPrismaSchemaForLint = (schema: string): string => {
   const escaped = schema.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-  return `const __PRISMA_SCHEMA__ = String.raw\`\n${escaped}\n\`\n;\n`;
+  return `const __PRISMA_SCHEMA__ = String.raw\`\n${escaped}\n\`\n;\nvoid __PRISMA_SCHEMA__;\n`;
 };
 
 export const extractPrismaSchemaFromSource = (sourceText: string): { schema: string; lineOffset: number } => {
@@ -86,8 +91,11 @@ export const buildSchemaLocator = (schema: string): SchemaLocator => {
   const modelMapLocations = new Map<string, SourceLocation>();
   const modelMapValues = new Map<string, string>();
   const modelFieldMapValues = new Map<string, Map<string, string>>();
+  const modelFieldMapLocations = new Map<string, Map<string, SourceLocation>>();
   const enumLocations = new Map<string, SourceLocation>();
   const enumValueLocations = new Map<string, Map<string, SourceLocation>>();
+  const enumValueMapValues = new Map<string, Map<string, string>>();
+  const enumValueMapLocations = new Map<string, Map<string, SourceLocation>>();
   const enumMapLocations = new Map<string, SourceLocation>();
   const enumMapValues = new Map<string, string>();
 
@@ -109,11 +117,32 @@ export const buildSchemaLocator = (schema: string): SchemaLocator => {
     return modelFieldMapValues.get(modelName) as Map<string, string>;
   };
 
+  const ensureModelFieldMapLocations = (modelName: string) => {
+    if (!modelFieldMapLocations.has(modelName)) {
+      modelFieldMapLocations.set(modelName, new Map());
+    }
+    return modelFieldMapLocations.get(modelName) as Map<string, SourceLocation>;
+  };
+
   const ensureEnumValues = (enumName: string) => {
     if (!enumValueLocations.has(enumName)) {
       enumValueLocations.set(enumName, new Map());
     }
     return enumValueLocations.get(enumName) as Map<string, SourceLocation>;
+  };
+
+  const ensureEnumValueMaps = (enumName: string) => {
+    if (!enumValueMapValues.has(enumName)) {
+      enumValueMapValues.set(enumName, new Map());
+    }
+    return enumValueMapValues.get(enumName) as Map<string, string>;
+  };
+
+  const ensureEnumValueMapLocations = (enumName: string) => {
+    if (!enumValueMapLocations.has(enumName)) {
+      enumValueMapLocations.set(enumName, new Map());
+    }
+    return enumValueMapLocations.get(enumName) as Map<string, SourceLocation>;
   };
 
   lines.forEach((line, index) => {
@@ -168,6 +197,10 @@ export const buildSchemaLocator = (schema: string): SchemaLocator => {
         const mapMatch = trimmed.match(/@map\("([^"]+)"\)/);
         if (mapMatch) {
           ensureModelFieldMaps(currentModel).set(fieldMatch[1], mapMatch[1]);
+          ensureModelFieldMapLocations(currentModel).set(fieldMatch[1], {
+            line: lineNumber,
+            column: Math.max(0, line.indexOf('@map')),
+          });
         }
       }
       return;
@@ -193,6 +226,14 @@ export const buildSchemaLocator = (schema: string): SchemaLocator => {
           line: lineNumber,
           column: Math.max(0, line.indexOf(valueMatch[1])),
         });
+        const mapMatch = trimmed.match(/@map\("([^"]+)"\)/);
+        if (mapMatch) {
+          ensureEnumValueMaps(currentEnum).set(valueMatch[1], mapMatch[1]);
+          ensureEnumValueMapLocations(currentEnum).set(valueMatch[1], {
+            line: lineNumber,
+            column: Math.max(0, line.indexOf('@map')),
+          });
+        }
       }
     }
   });
@@ -203,8 +244,11 @@ export const buildSchemaLocator = (schema: string): SchemaLocator => {
     modelMapLocations,
     modelMapValues,
     modelFieldMapValues,
+    modelFieldMapLocations,
     enumLocations,
     enumValueLocations,
+    enumValueMapValues,
+    enumValueMapLocations,
     enumMapLocations,
     enumMapValues,
   };
@@ -217,3 +261,16 @@ export const isCamelCase = (value: string): boolean => /^[a-z][a-zA-Z0-9]*$/.tes
 export const isPascalCase = (value: string): boolean => /^[A-Z][a-zA-Z0-9]*$/.test(value) && !value.includes('_');
 
 export const isScreamingSnakeCase = (value: string): boolean => /^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$/.test(value);
+
+export const isNamingStyle = (value: string, style: NamingStyle): boolean => {
+  switch (style) {
+    case 'snake_case':
+      return isSnakeCase(value);
+    case 'camel_case':
+      return isCamelCase(value);
+    case 'pascal_case':
+      return isPascalCase(value);
+    case 'screaming_snake_case':
+      return isScreamingSnakeCase(value);
+  }
+};

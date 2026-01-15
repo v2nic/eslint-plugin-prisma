@@ -1,0 +1,80 @@
+import { createRule } from '../utils/create-rule';
+import {
+  applyLineOffset,
+  getPrismaSchemaContext,
+  isNamingStyle,
+  type NamingStyle,
+  toReportLocation,
+} from '../utils/prisma-schema';
+
+const STYLE_CHOICES = ['snake_case', 'camel_case', 'pascal_case', 'screaming_snake_case'] as const;
+
+type Options = [{ style?: NamingStyle }?];
+
+type MessageIds = 'invalidEnumValue';
+
+const DEFAULT_OPTIONS = [{ style: 'snake_case' }] as const;
+
+export const dbEnumValueStyle = createRule<Options, MessageIds>({
+  name: 'db-enum-value-style',
+  defaultOptions: DEFAULT_OPTIONS,
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Enforce database enum values to follow the configured style',
+    },
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          style: {
+            type: 'string',
+            enum: [...STYLE_CHOICES],
+            default: DEFAULT_OPTIONS[0].style,
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      invalidEnumValue: 'Database enum values must follow the configured style.',
+    },
+  },
+  create(context) {
+    const filename = context.getFilename();
+    if (!filename.endsWith('.prisma') && !filename.includes('.prisma')) {
+      return {};
+    }
+
+    const { style = 'snake_case' } = context.options[0] ?? DEFAULT_OPTIONS[0];
+
+    return {
+      Program() {
+        const { dmmf, locator, lineOffset } = getPrismaSchemaContext(context.getSourceCode().text);
+        const node = context.getSourceCode().ast;
+
+        const reportEnumValue = (enumName: string, valueName: string, preferMap: boolean) => {
+          const mapLocation = locator.enumValueMapLocations.get(enumName)?.get(valueName);
+          const nameLocation = locator.enumValueLocations.get(enumName)?.get(valueName);
+          const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
+          if (!location) {
+            context.report({ node, messageId: 'invalidEnumValue' });
+            return;
+          }
+          const offsetLocation = applyLineOffset(location, lineOffset);
+          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidEnumValue' });
+        };
+
+        dmmf.datamodel.enums.forEach((enumItem) => {
+          enumItem.values.forEach((value) => {
+            const mapValue = locator.enumValueMapValues.get(enumItem.name)?.get(value.name);
+            const effectiveName = mapValue ?? value.name;
+            if (!isNamingStyle(effectiveName, style)) {
+              reportEnumValue(enumItem.name, value.name, Boolean(mapValue));
+            }
+          });
+        });
+      },
+    };
+  },
+});

@@ -1,11 +1,11 @@
 import { Linter } from 'eslint';
-import { prismaTableNames } from '../../src/rules/prisma-table-names';
+import { dbEnumValueStyle } from '../../src/rules/db-enum-value-style';
 import { wrapPrismaSchemaForLint } from '../../src/utils/prisma-schema';
 
 const linter = new Linter();
 (linter as unknown as { defineRule: (...args: unknown[]) => void }).defineRule(
-  'prisma/prisma-table-names',
-  prismaTableNames as unknown,
+  'prisma/db-enum-value-style',
+  dbEnumValueStyle as unknown,
 );
 
 const SCHEMA_HEADER = `
@@ -21,12 +21,15 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
-const verify = (schema: string, options?: { ignoreModels?: string[] }) =>
+const verify = (
+  schema: string,
+  options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case' },
+) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {
       rules: {
-        'prisma/prisma-table-names': ['error', options ?? {}],
+        'prisma/db-enum-value-style': ['error', options ?? {}],
       },
       parserOptions: {
         ecmaVersion: 2020,
@@ -39,44 +42,51 @@ const verify = (schema: string, options?: { ignoreModels?: string[] }) =>
     },
   );
 
-describe('prisma-table-names', () => {
-  it('accepts @@map with snake_case', () => {
+describe('db-enum-value-style', () => {
+  it('accepts snake_case values without map by default', () => {
     const messages = verify(`
-model ChargePlanSlot {
-  id String @id
-  @@map("charge_plan_slot")
+enum ExampleEnum {
+  example_value
 }
 `);
     expect(messages).toHaveLength(0);
   });
 
-  it('reports missing @@map', () => {
+  it('accepts snake_case map values when present', () => {
     const messages = verify(`
-model ChargePlanSlot {
-  id String @id
+enum ExampleEnum {
+  ExampleValue @map("example_value")
+}
+`);
+    expect(messages).toHaveLength(0);
+  });
+
+  it('reports non-matching effective values', () => {
+    const messages = verify(`
+enum ExampleEnum {
+  ExampleValue
 }
 `);
     expect(messages).toHaveLength(1);
   });
 
-  it('reports non-snake_case @@map', () => {
+  it('reports non-matching map values', () => {
     const messages = verify(`
-model ChargePlanSlot {
-  id String @id
-  @@map("ChargePlanSlot")
+enum ExampleEnum {
+  ExampleValue @map("ExampleValue")
 }
 `);
     expect(messages).toHaveLength(1);
   });
 
-  it('ignores configured models', () => {
+  it('accepts screaming_snake_case when configured', () => {
     const messages = verify(
       `
-model ChargePlanSlot {
-  id String @id
+enum ExampleEnum {
+  EXAMPLE_VALUE
 }
 `,
-      { ignoreModels: ['ChargePlanSlot'] },
+      { style: 'screaming_snake_case' },
     );
     expect(messages).toHaveLength(0);
   });
