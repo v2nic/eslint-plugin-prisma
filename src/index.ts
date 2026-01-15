@@ -16,11 +16,29 @@ import { prismaSchemaProcessor } from './utils/prisma-processor';
 export = {
   configs: {
     recommended: {
-      plugins: ['prisma'],
+      plugins: ['@v2nic/prisma'],
       rules: {
         'prisma/no-unsafe': 'error',
         'prisma/require-select': 'error',
       } satisfies Record<string, Linter.RuleLevel>,
+    },
+    'prisma-schema': {
+      plugins: ['@v2nic/prisma'],
+      overrides: [
+        {
+          files: ['*.prisma'],
+          processor: '@v2nic/prisma/.prisma',
+          parserOptions: {
+            ecmaVersion: 2020,
+          },
+        },
+        {
+          files: ['*.prisma.js'],
+          parserOptions: {
+            ecmaVersion: 2020,
+          },
+        },
+      ],
     },
   },
   meta: {

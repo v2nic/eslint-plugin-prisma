@@ -30,6 +30,24 @@ Load the `recommended` configuration:
 }
 ```
 
+To lint Prisma schema files, enable the processor configuration and set rules in an override:
+
+```json
+{
+  "extends": ["plugin:@v2nic/prisma/prisma-schema"],
+  "overrides": [
+    {
+      "files": ["*.prisma"],
+      "rules": {
+        "prisma/prisma-column-names": "error",
+        "prisma/prisma-table-names": "error",
+        "prisma/prisma-enum-names": "error"
+      }
+    }
+  ]
+}
+```
+
 Add `@v2nic/prisma` to the plugins section of your `.eslintrc` configuration file. You can omit the `eslint-plugin-` prefix.
 Then configure the rules you want to use under the rules section:
 
@@ -47,9 +65,10 @@ Then configure the rules you want to use under the rules section:
 
 <!-- begin auto-generated configs list -->
 
-|     | Name          |
-| :-- | :------------ |
-| ✅  | `recommended` |
+|     | Name            |
+| :-- | :-------------- |
+|     | `prisma-schema` |
+| ✅  | `recommended`   |
 
 <!-- end auto-generated configs list -->
 

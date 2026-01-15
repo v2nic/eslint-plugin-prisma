@@ -7,7 +7,7 @@ export const prismaSchemaProcessor: Processor.ProcessorModule = {
     version: '1.0.0',
   },
   preprocess(text: string, filename: string) {
-    return [{ text: wrapPrismaSchemaForLint(text), filename }];
+    return [{ text: wrapPrismaSchemaForLint(text), filename: `${filename}.prisma.js` }];
   },
   postprocess(messages) {
     return messages.flat();
