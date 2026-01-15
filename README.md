@@ -47,8 +47,8 @@ Then configure the rules you want to use under the rules section:
 
 <!-- begin auto-generated configs list -->
 
-|    | Name          |
-| :- | :------------ |
+|     | Name          |
+| :-- | :------------ |
 | ✅  | `recommended` |
 
 <!-- end auto-generated configs list -->
@@ -61,9 +61,9 @@ Then configure the rules you want to use under the rules section:
 ✅ Set in the `recommended` configuration.\
 💡 Manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
 
-| Name                                           | Description                                               | 💼 | 💡 |
-| :--------------------------------------------- | :-------------------------------------------------------- | :- | :- |
-| [no-unsafe](docs/rules/no-unsafe.md)           | Disallow the use of potentially unsafe Prisma methods     | ✅  |    |
-| [require-select](docs/rules/require-select.md) | Forces explicit selection of all fields in Prisma queries | ✅  | 💡 |
+| Name                                           | Description                                               | 💼  | 💡  |
+| :--------------------------------------------- | :-------------------------------------------------------- | :-- | :-- |
+| [no-unsafe](docs/rules/no-unsafe.md)           | Disallow the use of potentially unsafe Prisma methods     | ✅  |     |
+| [require-select](docs/rules/require-select.md) | Forces explicit selection of all fields in Prisma queries | ✅  | 💡  |
 
 <!-- end auto-generated rules list -->
