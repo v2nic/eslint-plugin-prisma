@@ -49,7 +49,7 @@ export const applyLineOffset = (location: SourceLocation, lineOffset: number): S
 
 export const wrapPrismaSchemaForLint = (schema: string): string => {
   const escaped = schema.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-  return `const __PRISMA_SCHEMA__ = String.raw\`\n${escaped}\n\`\n;\nvoid __PRISMA_SCHEMA__;\n`;
+  return `/* eslint-disable no-unused-vars */\nconst __PRISMA_SCHEMA__ = String.raw\`\n${escaped}\n\`\n;\nvoid __PRISMA_SCHEMA__;\n/* eslint-enable no-unused-vars */\n`;
 };
 
 export const extractPrismaSchemaFromSource = (sourceText: string): { schema: string; lineOffset: number } => {

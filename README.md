@@ -22,23 +22,36 @@ npm install @v2nic/eslint-plugin-prisma --save-dev
 
 ## Usage
 
-Load the `recommended` configuration:
+Example failure for schema field naming:
 
-```json
-{
-  "extends": ["plugin:@v2nic/prisma/recommended"]
+```prisma
+model InvoiceItem {
+  id Int @id
+  customer_id String
 }
 ```
 
-For ESLint flat config, use the processor object and plugin map:
+```text
+schema.prisma
+  3:3  error  Schema field names must follow the camel_case style  prisma/schema-field-name-style
+```
+
+### ESLint flat config
+
+Use the processor object and plugin map. This complete example shows both overrides:
 
 ```js
 import prisma from '@v2nic/eslint-plugin-prisma';
 
 export default [
-  ...prisma.configs['prisma-schema-flat'],
   {
     files: ['**/*.prisma'],
+    plugins: { prisma },
+    processor: prisma.processors['.prisma'],
+  },
+  {
+    files: ['**/*.prisma.js'],
+    plugins: { prisma },
     rules: {
       'prisma/schema-field-name-style': 'error',
       'prisma/schema-model-name-style': 'error',
@@ -53,6 +66,20 @@ export default [
 ];
 ```
 
+The processor rewrites `schema.prisma` into `schema.prisma.js`, so rule overrides must target `**/*.prisma.js` for flat config. An override is the file-matching block in your config array that applies rules to a specific glob. The `**/*.prisma` override only enables the processor. If you prefer, `prisma.configs['prisma-schema-flat']` provides the processor-only override.
+
+#### Rule selection
+
+You must specify the rules you want to enable. If you want the naming rules with defaults, use the bundled preset:
+
+```js
+import prisma from '@v2nic/eslint-plugin-prisma';
+
+export default [...prisma.configs['prisma-schema-flat-recommended']];
+```
+
+### Classic config (.eslintrc)
+
 To lint Prisma schema files, enable the processor configuration and set rules in an override:
 
 ```json
@@ -60,7 +87,7 @@ To lint Prisma schema files, enable the processor configuration and set rules in
   "extends": ["plugin:@v2nic/prisma/prisma-schema"],
   "overrides": [
     {
-      "files": ["*.prisma"],
+      "files": ["*.prisma.js"],
       "rules": {
         "prisma/schema-field-name-style": "error",
         "prisma/schema-model-name-style": "error",
@@ -76,6 +103,8 @@ To lint Prisma schema files, enable the processor configuration and set rules in
 }
 ```
 
+For classic config, you can also use the bundled `prisma-schema-recommended` config for default naming rules on the processed `*.prisma.js` file.
+
 Add `@v2nic/prisma` to the plugins section of your `.eslintrc` configuration file. You can omit the `eslint-plugin-` prefix.
 Then configure the rules you want to use under the rules section:
 
@@ -89,17 +118,27 @@ Then configure the rules you want to use under the rules section:
 }
 ```
 
+Load the `recommended` configuration:
+
+```json
+{
+  "extends": ["plugin:@v2nic/prisma/recommended"]
+}
+```
+
 Rule names are always under the `prisma/*` namespace even when the plugin is scoped.
 
 ## Configurations
 
 <!-- begin auto-generated configs list -->
 
-|     | Name                 |
-| :-- | :------------------- |
-|     | `prisma-schema`      |
-|     | `prisma-schema-flat` |
-| ✅  | `recommended`        |
+|     | Name                             |
+| :-- | :------------------------------- |
+|     | `prisma-schema`                  |
+|     | `prisma-schema-flat`             |
+|     | `prisma-schema-flat-recommended` |
+|     | `prisma-schema-recommended`      |
+| ✅  | `recommended`                    |
 
 <!-- end auto-generated configs list -->
 

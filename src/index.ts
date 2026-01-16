@@ -18,6 +18,17 @@ import { schemaEnumValueStyle } from './rules/schema-enum-value-style';
 import { schemaFieldNameStyle } from './rules/schema-field-name-style';
 import { schemaModelNameStyle } from './rules/schema-model-name-style';
 
+const PRISMA_SCHEMA_NAMING_RULES = {
+  'prisma/schema-field-name-style': 'error',
+  'prisma/schema-model-name-style': 'error',
+  'prisma/schema-enum-name-style': 'error',
+  'prisma/schema-enum-value-style': 'error',
+  'prisma/db-table-name-style': 'error',
+  'prisma/db-column-name-style': 'error',
+  'prisma/db-enum-name-style': 'error',
+  'prisma/db-enum-value-style': 'error',
+} satisfies Record<string, Linter.RuleLevel>;
+
 const prismaPlugin = {
   meta: {
     name,
@@ -67,6 +78,27 @@ const configs = {
       },
     ],
   },
+  'prisma-schema-recommended': {
+    plugins: ['@v2nic/prisma'],
+    overrides: [
+      {
+        files: ['*.prisma'],
+        processor: '@v2nic/prisma/.prisma',
+        parserOptions: {
+          ecmaVersion: 2020,
+        },
+      },
+      {
+        files: ['*.prisma.js'],
+        rules: {
+          ...PRISMA_SCHEMA_NAMING_RULES,
+        },
+        parserOptions: {
+          ecmaVersion: 2020,
+        },
+      },
+    ],
+  },
   'prisma-schema-flat': [
     {
       files: ['**/*.prisma'],
@@ -78,6 +110,27 @@ const configs = {
     },
     {
       files: ['**/*.prisma.js'],
+      plugins: { prisma: prismaPlugin },
+      languageOptions: {
+        ecmaVersion: 2020,
+      },
+    },
+  ],
+  'prisma-schema-flat-recommended': [
+    {
+      files: ['**/*.prisma'],
+      plugins: { prisma: prismaPlugin },
+      processor: prismaPlugin.processors?.['.prisma'],
+      languageOptions: {
+        ecmaVersion: 2020,
+      },
+    },
+    {
+      files: ['**/*.prisma.js'],
+      plugins: { prisma: prismaPlugin },
+      rules: {
+        ...PRISMA_SCHEMA_NAMING_RULES,
+      },
       languageOptions: {
         ecmaVersion: 2020,
       },
