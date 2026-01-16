@@ -85,7 +85,7 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
-    expect(messages[0].message).toBe('Schema field names must follow the camel_case style.');
+    expect(messages[0].message).toBe('Schema field names must follow the camelCase style.');
   });
 
   it('normalizes configured style labels in messages', () => {
@@ -101,7 +101,7 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
-    expect(messages[0].message).toBe('Schema field names must follow the camel_case style.');
+    expect(messages[0].message).toBe('Schema field names must follow the camelCase style.');
   });
 
   it('accepts pascal_case when configured', () => {

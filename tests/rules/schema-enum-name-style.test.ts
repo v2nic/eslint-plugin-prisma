@@ -82,7 +82,7 @@ enum example_enum {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
-    expect(messages[0].message).toBe('Schema enum names must follow the pascal_case style.');
+    expect(messages[0].message).toBe('Schema enum names must follow the PascalCase style.');
   });
 
   it('normalizes configured style labels in messages', () => {

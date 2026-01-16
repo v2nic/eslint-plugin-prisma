@@ -1,6 +1,6 @@
 {
   "name": "@v2nic/eslint-plugin-prisma",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "ESLint plugin ensuring best practices and code quality for Prisma with TypeScript",
   "keywords": [
     "Prisma",

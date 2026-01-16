@@ -44,6 +44,13 @@ const NAMING_STYLE_ALIASES: Record<string, NamingStyle> = {
   screamingsnakecase: 'screaming_snake_case',
 };
 
+const NAMING_STYLE_LABELS: Record<NamingStyle, string> = {
+  snake_case: 'snake_case',
+  camel_case: 'camelCase',
+  pascal_case: 'PascalCase',
+  screaming_snake_case: 'SCREAMING_SNAKE_CASE',
+};
+
 const normalizeNamingStyleKey = (style: string): string => style.replace(/_/g, '').toLowerCase();
 
 export const resolveNamingStyle = (
@@ -51,7 +58,7 @@ export const resolveNamingStyle = (
   defaultStyle: NamingStyle,
 ): { style: NamingStyle; styleLabel: string } => {
   if (!styleInput) {
-    return { style: defaultStyle, styleLabel: defaultStyle };
+    return { style: defaultStyle, styleLabel: NAMING_STYLE_LABELS[defaultStyle] };
   }
 
   const normalizedKey = normalizeNamingStyleKey(styleInput);
@@ -63,7 +70,7 @@ export const resolveNamingStyle = (
     );
   }
 
-  return { style, styleLabel: style };
+  return { style, styleLabel: NAMING_STYLE_LABELS[style] };
 };
 
 export const toReportLocation = (location: SourceLocation): ReportLocation => ({
@@ -189,7 +196,7 @@ export const buildSchemaLocator = (schema: string): SchemaLocator => {
       return;
     }
 
-    const modelMatch = line.match(/^\s*model\s+(\w+)/);
+    const modelMatch = line.match(/^\s*model\s+(\w+)\s*\{/);
     if (modelMatch) {
       currentModel = modelMatch[1];
       currentEnum = null;
