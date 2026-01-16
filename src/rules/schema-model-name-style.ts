@@ -42,7 +42,7 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
       },
     ],
     messages: {
-      invalidModelName: 'Schema model names must follow the configured style.',
+      invalidModelName: 'Schema model names must follow the {{style}} style.',
     },
   },
   create(context) {
@@ -61,11 +61,16 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
         const reportModel = (modelName: string) => {
           const location = locator.modelLocations.get(modelName);
           if (!location) {
-            context.report({ node, messageId: 'invalidModelName' });
+            context.report({ node, messageId: 'invalidModelName', data: { style } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
-          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidModelName' });
+          context.report({
+            node,
+            loc: toReportLocation(offsetLocation),
+            messageId: 'invalidModelName',
+            data: { style },
+          });
         };
 
         dmmf.datamodel.models.forEach((model) => {

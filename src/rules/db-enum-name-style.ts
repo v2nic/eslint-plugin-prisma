@@ -37,7 +37,7 @@ export const dbEnumNameStyle = createRule<Options, MessageIds>({
       },
     ],
     messages: {
-      invalidEnumName: 'Database enum names must follow the configured style.',
+      invalidEnumName: 'Database enum names must follow the {{style}} style.',
     },
   },
   create(context) {
@@ -58,11 +58,16 @@ export const dbEnumNameStyle = createRule<Options, MessageIds>({
           const nameLocation = locator.enumLocations.get(enumName);
           const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
           if (!location) {
-            context.report({ node, messageId: 'invalidEnumName' });
+            context.report({ node, messageId: 'invalidEnumName', data: { style } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
-          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidEnumName' });
+          context.report({
+            node,
+            loc: toReportLocation(offsetLocation),
+            messageId: 'invalidEnumName',
+            data: { style },
+          });
         };
 
         dmmf.datamodel.enums.forEach((enumItem) => {

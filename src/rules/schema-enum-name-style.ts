@@ -37,7 +37,7 @@ export const schemaEnumNameStyle = createRule<Options, MessageIds>({
       },
     ],
     messages: {
-      invalidEnumName: 'Schema enum names must follow the configured style.',
+      invalidEnumName: 'Schema enum names must follow the {{style}} style.',
     },
   },
   create(context) {
@@ -56,11 +56,16 @@ export const schemaEnumNameStyle = createRule<Options, MessageIds>({
         const reportEnum = (enumName: string) => {
           const location = locator.enumLocations.get(enumName);
           if (!location) {
-            context.report({ node, messageId: 'invalidEnumName' });
+            context.report({ node, messageId: 'invalidEnumName', data: { style } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
-          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidEnumName' });
+          context.report({
+            node,
+            loc: toReportLocation(offsetLocation),
+            messageId: 'invalidEnumName',
+            data: { style },
+          });
         };
 
         dmmf.datamodel.enums.forEach((enumItem) => {

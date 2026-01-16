@@ -47,7 +47,7 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
       },
     ],
     messages: {
-      invalidColumnName: 'Database column names must follow the configured style.',
+      invalidColumnName: 'Database column names must follow the {{style}} style.',
     },
   },
   create(context) {
@@ -68,11 +68,16 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
           const nameLocation = locator.modelFieldLocations.get(modelName)?.get(fieldName);
           const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
           if (!location) {
-            context.report({ node, messageId: 'invalidColumnName' });
+            context.report({ node, messageId: 'invalidColumnName', data: { style } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
-          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidColumnName' });
+          context.report({
+            node,
+            loc: toReportLocation(offsetLocation),
+            messageId: 'invalidColumnName',
+            data: { style },
+          });
         };
 
         dmmf.datamodel.models.forEach((model) => {

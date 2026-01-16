@@ -21,6 +21,17 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
+const findLineColumn = (source: string, marker: string): { line: number; column: number } => {
+  const lines = source.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const columnIndex = lines[index].indexOf(marker);
+    if (columnIndex !== -1) {
+      return { line: index + 1, column: columnIndex + 1 };
+    }
+  }
+  throw new Error(`Marker not found: ${marker}`);
+};
+
 const verify = (
   schema: string,
   options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case' },
@@ -60,6 +71,21 @@ enum example_enum {
 `);
     expect(messages).toHaveLength(1);
     expect(messages[0].ruleId).toBe('prisma/schema-enum-name-style');
+  });
+
+  it('reports line and style for invalid enum names', () => {
+    const schema = `
+enum example_enum {
+  VALUE
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const location = findLineColumn(source, 'example_enum');
+    const messages = verify(schema);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].line).toBe(location.line);
+    expect(messages[0].column).toBe(location.column);
+    expect(messages[0].message).toBe('Schema enum names must follow the pascal_case style.');
   });
 
   it('accepts snake_case when configured', () => {

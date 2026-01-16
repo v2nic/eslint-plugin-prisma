@@ -66,7 +66,7 @@ export const extractPrismaSchemaFromSource = (sourceText: string): { schema: str
     schemaText = schemaText.slice(0, -1);
   }
 
-  return { schema: schemaText.replace(/\\`/g, '`').replace(/\\\$\{/g, '${'), lineOffset: 1 };
+  return { schema: schemaText.replace(/\\`/g, '`').replace(/\\\$\{/g, '${'), lineOffset: 0 };
 };
 
 export const getDmmfFromSchema = (schema: string): DMMF.Document => {

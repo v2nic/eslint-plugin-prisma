@@ -42,7 +42,7 @@ export const dbTableNameStyle = createRule<Options, MessageIds>({
       },
     ],
     messages: {
-      invalidTableName: 'Database table names must follow the configured style.',
+      invalidTableName: 'Database table names must follow the {{style}} style.',
     },
   },
   create(context) {
@@ -63,11 +63,16 @@ export const dbTableNameStyle = createRule<Options, MessageIds>({
           const nameLocation = locator.modelLocations.get(modelName);
           const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
           if (!location) {
-            context.report({ node, messageId: 'invalidTableName' });
+            context.report({ node, messageId: 'invalidTableName', data: { style } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
-          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidTableName' });
+          context.report({
+            node,
+            loc: toReportLocation(offsetLocation),
+            messageId: 'invalidTableName',
+            data: { style },
+          });
         };
 
         dmmf.datamodel.models.forEach((model) => {

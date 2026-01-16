@@ -47,7 +47,7 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
       },
     ],
     messages: {
-      invalidFieldName: 'Schema field names must follow the configured style.',
+      invalidFieldName: 'Schema field names must follow the {{style}} style.',
     },
   },
   create(context) {
@@ -66,11 +66,16 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
         const reportField = (modelName: string, fieldName: string) => {
           const location = locator.modelFieldLocations.get(modelName)?.get(fieldName);
           if (!location) {
-            context.report({ node, messageId: 'invalidFieldName' });
+            context.report({ node, messageId: 'invalidFieldName', data: { style } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
-          context.report({ node, loc: toReportLocation(offsetLocation), messageId: 'invalidFieldName' });
+          context.report({
+            node,
+            loc: toReportLocation(offsetLocation),
+            messageId: 'invalidFieldName',
+            data: { style },
+          });
         };
 
         dmmf.datamodel.models.forEach((model) => {

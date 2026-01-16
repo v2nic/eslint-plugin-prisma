@@ -21,6 +21,17 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
+const findLineColumn = (source: string, marker: string): { line: number; column: number } => {
+  const lines = source.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const columnIndex = lines[index].indexOf(marker);
+    if (columnIndex !== -1) {
+      return { line: index + 1, column: columnIndex + 1 };
+    }
+  }
+  throw new Error(`Marker not found: ${marker}`);
+};
+
 const verify = (
   schema: string,
   options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case'; allowlist?: string[] },
@@ -81,6 +92,22 @@ model ExampleModel {
 }
 `);
     expect(messages).toHaveLength(1);
+  });
+
+  it('reports line and style for invalid mapped column names', () => {
+    const schema = `
+model ExampleModel {
+  id String @id
+  exampleFieldId String @map("ExampleFieldId")
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const location = findLineColumn(source, '@map');
+    const messages = verify(schema);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].line).toBe(location.line);
+    expect(messages[0].column).toBe(location.column);
+    expect(messages[0].message).toBe('Database column names must follow the snake_case style.');
   });
 
   it('allows allowlisted fields', () => {

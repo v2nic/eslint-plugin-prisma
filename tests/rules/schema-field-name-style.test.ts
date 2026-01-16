@@ -21,6 +21,17 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
+const findLineColumn = (source: string, marker: string): { line: number; column: number } => {
+  const lines = source.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const columnIndex = lines[index].indexOf(marker);
+    if (columnIndex !== -1) {
+      return { line: index + 1, column: columnIndex + 1 };
+    }
+  }
+  throw new Error(`Marker not found: ${marker}`);
+};
+
 const verify = (
   schema: string,
   options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case'; allowlist?: string[] },
@@ -62,6 +73,22 @@ model ExampleModel {
 `);
     expect(messages).toHaveLength(1);
     expect(messages[0].ruleId).toBe('prisma/schema-field-name-style');
+  });
+
+  it('reports line and style for invalid field names', () => {
+    const schema = `
+model ExampleModel {
+  id String @id @map("id")
+  example_field_id String
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const location = findLineColumn(source, 'example_field_id');
+    const messages = verify(schema);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].line).toBe(location.line);
+    expect(messages[0].column).toBe(location.column);
+    expect(messages[0].message).toBe('Schema field names must follow the camel_case style.');
   });
 
   it('accepts pascal_case when configured', () => {
