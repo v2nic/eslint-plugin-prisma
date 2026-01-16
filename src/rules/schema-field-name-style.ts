@@ -32,11 +32,13 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
           },
           allowlist: {
             type: 'array',
+            description: 'Field names that can keep their schema name even if they do not match the configured style.',
             items: { type: 'string' },
             default: [...DEFAULT_OPTIONS[0].allowlist],
           },
           ignoreModels: {
             type: 'array',
+            description: 'Model names to skip when validating schema field names.',
             items: { type: 'string' },
             default: [...DEFAULT_OPTIONS[0].ignoreModels],
           },

@@ -33,7 +33,7 @@ model InvoiceItem {
 
 ```text
 schema.prisma
-  3:3  error  Schema field names must follow the camel_case style  prisma/schema-field-name-style
+  3:3  error  Schema field names must follow the camelCase style  prisma/schema-field-name-style
 ```
 
 ### ESLint flat config
@@ -130,6 +130,8 @@ Rule names are always under the `prisma/*` namespace even when the plugin is sco
 
 ## Configurations
 
+The table below is generated from the exported configs. The ✅ marker indicates the `recommended` preset, which enables `no-unsafe` and `require-select` only.
+
 <!-- begin auto-generated configs list -->
 
 |     | Name                             |
@@ -143,6 +145,8 @@ Rule names are always under the `prisma/*` namespace even when the plugin is sco
 <!-- end auto-generated configs list -->
 
 ## Rules
+
+The rules table is generated from each rule definition. The 💡 marker means the rule provides ESLint suggestions via `meta.hasSuggestions`.
 
 <!-- begin auto-generated rules list -->
 

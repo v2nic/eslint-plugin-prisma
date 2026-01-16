@@ -32,6 +32,7 @@ export const dbTableNameStyle = createRule<Options, MessageIds>({
           },
           ignoreModels: {
             type: 'array',
+            description: 'Model names to skip when validating database table names.',
             items: { type: 'string' },
             default: [...DEFAULT_OPTIONS[0].ignoreModels],
           },
