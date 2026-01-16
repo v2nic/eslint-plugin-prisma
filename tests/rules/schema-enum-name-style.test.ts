@@ -32,10 +32,7 @@ const findLineColumn = (source: string, marker: string): { line: number; column:
   throw new Error(`Marker not found: ${marker}`);
 };
 
-const verify = (
-  schema: string,
-  options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case' },
-) =>
+const verify = (schema: string, options?: { style?: string }) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {
@@ -86,6 +83,21 @@ enum example_enum {
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
     expect(messages[0].message).toBe('Schema enum names must follow the pascal_case style.');
+  });
+
+  it('preserves configured style label casing in messages', () => {
+    const schema = `
+enum ExampleEnum {
+  VALUE
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const location = findLineColumn(source, 'ExampleEnum');
+    const messages = verify(schema, { style: 'SnakeCase' });
+    expect(messages).toHaveLength(1);
+    expect(messages[0].line).toBe(location.line);
+    expect(messages[0].column).toBe(location.column);
+    expect(messages[0].message).toBe('Schema enum names must follow the SnakeCase style.');
   });
 
   it('accepts snake_case when configured', () => {

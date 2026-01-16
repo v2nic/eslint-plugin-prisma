@@ -6,8 +6,8 @@
 
 <!-- begin auto-generated rule options list -->
 
-| Name    | Type   | Choices                                                           | Default                |
-| :------ | :----- | :---------------------------------------------------------------- | :--------------------- |
-| `style` | String | `snake_case`, `camel_case`, `pascal_case`, `screaming_snake_case` | `screaming_snake_case` |
+| Name    | Description                                                                             | Type   | Default                |
+| :------ | :-------------------------------------------------------------------------------------- | :----- | :--------------------- |
+| `style` | Case-insensitive. Accepts snake_case, camel_case, pascal_case, or screaming_snake_case. | String | `screaming_snake_case` |
 
 <!-- end auto-generated rule options list -->

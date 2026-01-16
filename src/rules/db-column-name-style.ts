@@ -3,13 +3,11 @@ import {
   applyLineOffset,
   getPrismaSchemaContext,
   isNamingStyle,
-  type NamingStyle,
+  resolveNamingStyle,
   toReportLocation,
 } from '../utils/prisma-schema';
 
-const STYLE_CHOICES = ['snake_case', 'camel_case', 'pascal_case', 'screaming_snake_case'] as const;
-
-type Options = [{ style?: NamingStyle; allowlist?: readonly string[]; ignoreModels?: readonly string[] }?];
+type Options = [{ style?: string; allowlist?: readonly string[]; ignoreModels?: readonly string[] }?];
 
 type MessageIds = 'invalidColumnName';
 
@@ -29,7 +27,7 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
         properties: {
           style: {
             type: 'string',
-            enum: [...STYLE_CHOICES],
+            description: 'Case-insensitive. Accepts snake_case, camel_case, pascal_case, or screaming_snake_case.',
             default: DEFAULT_OPTIONS[0].style,
           },
           allowlist: {
@@ -56,7 +54,8 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
       return {};
     }
 
-    const { style = 'snake_case', allowlist = [], ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
+    const { style: styleInput, allowlist = [], ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
+    const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
 
     return {
       Program() {
@@ -68,7 +67,7 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
           const nameLocation = locator.modelFieldLocations.get(modelName)?.get(fieldName);
           const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
           if (!location) {
-            context.report({ node, messageId: 'invalidColumnName', data: { style } });
+            context.report({ node, messageId: 'invalidColumnName', data: { style: styleLabel } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
@@ -76,7 +75,7 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
             node,
             loc: toReportLocation(offsetLocation),
             messageId: 'invalidColumnName',
-            data: { style },
+            data: { style: styleLabel },
           });
         };
 

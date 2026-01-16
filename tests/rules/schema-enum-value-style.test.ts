@@ -21,10 +21,7 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
-const verify = (
-  schema: string,
-  options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case' },
-) =>
+const verify = (schema: string, options?: { style?: string }) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {
@@ -60,6 +57,19 @@ enum ExampleEnum {
 `);
     expect(messages).toHaveLength(1);
     expect(messages[0].ruleId).toBe('prisma/schema-enum-value-style');
+  });
+
+  it('preserves configured style label casing in messages', () => {
+    const messages = verify(
+      `
+enum ExampleEnum {
+  ExampleValue
+}
+`,
+      { style: 'SnakeCase' },
+    );
+    expect(messages).toHaveLength(1);
+    expect(messages[0].message).toBe('Schema enum values must follow the SnakeCase style.');
   });
 
   it('accepts snake_case when configured', () => {

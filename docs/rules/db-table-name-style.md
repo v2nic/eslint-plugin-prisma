@@ -6,9 +6,9 @@
 
 <!-- begin auto-generated rule options list -->
 
-| Name           | Type     | Choices                                                           | Default      |
-| :------------- | :------- | :---------------------------------------------------------------- | :----------- |
-| `ignoreModels` | String[] |                                                                   | `[]`         |
-| `style`        | String   | `snake_case`, `camel_case`, `pascal_case`, `screaming_snake_case` | `snake_case` |
+| Name           | Description                                                                             | Type     | Default      |
+| :------------- | :-------------------------------------------------------------------------------------- | :------- | :----------- |
+| `ignoreModels` |                                                                                         | String[] | `[]`         |
+| `style`        | Case-insensitive. Accepts snake_case, camel_case, pascal_case, or screaming_snake_case. | String   | `snake_case` |
 
 <!-- end auto-generated rule options list -->

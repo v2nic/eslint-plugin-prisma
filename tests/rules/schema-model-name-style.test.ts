@@ -21,10 +21,7 @@ generator client {
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
-const verify = (
-  schema: string,
-  options?: { style?: 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case' },
-) =>
+const verify = (schema: string, options?: { style?: string }) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {

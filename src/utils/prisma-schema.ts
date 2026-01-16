@@ -37,6 +37,35 @@ export type PrismaSchemaContext = {
 
 export type NamingStyle = 'snake_case' | 'camel_case' | 'pascal_case' | 'screaming_snake_case';
 
+const NAMING_STYLE_ALIASES: Record<string, NamingStyle> = {
+  snakecase: 'snake_case',
+  camelcase: 'camel_case',
+  pascalcase: 'pascal_case',
+  screamingsnakecase: 'screaming_snake_case',
+};
+
+const normalizeNamingStyleKey = (style: string): string => style.replace(/_/g, '').toLowerCase();
+
+export const resolveNamingStyle = (
+  styleInput: string | undefined,
+  defaultStyle: NamingStyle,
+): { style: NamingStyle; styleLabel: string } => {
+  if (!styleInput) {
+    return { style: defaultStyle, styleLabel: defaultStyle };
+  }
+
+  const normalizedKey = normalizeNamingStyleKey(styleInput);
+  const style = NAMING_STYLE_ALIASES[normalizedKey];
+
+  if (!style) {
+    throw new Error(
+      `Invalid style "${styleInput}". Expected snake_case, camel_case, pascal_case, or screaming_snake_case.`,
+    );
+  }
+
+  return { style, styleLabel: styleInput };
+};
+
 export const toReportLocation = (location: SourceLocation): ReportLocation => ({
   start: location,
   end: { line: location.line, column: location.column + 1 },

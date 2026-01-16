@@ -3,13 +3,11 @@ import {
   applyLineOffset,
   getPrismaSchemaContext,
   isNamingStyle,
-  type NamingStyle,
+  resolveNamingStyle,
   toReportLocation,
 } from '../utils/prisma-schema';
 
-const STYLE_CHOICES = ['snake_case', 'camel_case', 'pascal_case', 'screaming_snake_case'] as const;
-
-type Options = [{ style?: NamingStyle }?];
+type Options = [{ style?: string }?];
 
 type MessageIds = 'invalidEnumValue';
 
@@ -29,7 +27,7 @@ export const dbEnumValueStyle = createRule<Options, MessageIds>({
         properties: {
           style: {
             type: 'string',
-            enum: [...STYLE_CHOICES],
+            description: 'Case-insensitive. Accepts snake_case, camel_case, pascal_case, or screaming_snake_case.',
             default: DEFAULT_OPTIONS[0].style,
           },
         },
@@ -46,7 +44,8 @@ export const dbEnumValueStyle = createRule<Options, MessageIds>({
       return {};
     }
 
-    const { style = 'snake_case' } = context.options[0] ?? DEFAULT_OPTIONS[0];
+    const { style: styleInput } = context.options[0] ?? DEFAULT_OPTIONS[0];
+    const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
 
     return {
       Program() {
@@ -58,7 +57,7 @@ export const dbEnumValueStyle = createRule<Options, MessageIds>({
           const nameLocation = locator.enumValueLocations.get(enumName)?.get(valueName);
           const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
           if (!location) {
-            context.report({ node, messageId: 'invalidEnumValue', data: { style } });
+            context.report({ node, messageId: 'invalidEnumValue', data: { style: styleLabel } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
@@ -66,7 +65,7 @@ export const dbEnumValueStyle = createRule<Options, MessageIds>({
             node,
             loc: toReportLocation(offsetLocation),
             messageId: 'invalidEnumValue',
-            data: { style },
+            data: { style: styleLabel },
           });
         };
 
