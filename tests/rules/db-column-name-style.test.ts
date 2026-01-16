@@ -91,6 +91,22 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
   });
 
+  it('reports line and style for invalid column names', () => {
+    const schema = `
+model ExampleModel {
+  id String @id
+  exampleFieldId String
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const location = findLineColumn(source, 'exampleFieldId');
+    const messages = verify(schema);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].line).toBe(location.line);
+    expect(messages[0].column).toBe(location.column);
+    expect(messages[0].message).toBe('Database column names must follow the snake_case style.');
+  });
+
   it('reports line and style for invalid mapped column names', () => {
     const schema = `
 model ExampleModel {
@@ -107,7 +123,7 @@ model ExampleModel {
     expect(messages[0].message).toBe('Database column names must follow the snake_case style.');
   });
 
-  it('preserves configured style label casing in messages', () => {
+  it('normalizes configured style labels in messages', () => {
     const schema = `
 model ExampleModel {
   id String @id
@@ -120,7 +136,7 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
-    expect(messages[0].message).toBe('Database column names must follow the SnakeCase style.');
+    expect(messages[0].message).toBe('Database column names must follow the snake_case style.');
   });
 
   it('allows allowlisted fields', () => {

@@ -63,7 +63,7 @@ export const resolveNamingStyle = (
     );
   }
 
-  return { style, styleLabel: styleInput };
+  return { style, styleLabel: style };
 };
 
 export const toReportLocation = (location: SourceLocation): ReportLocation => ({
@@ -78,7 +78,7 @@ export const applyLineOffset = (location: SourceLocation, lineOffset: number): S
 
 export const wrapPrismaSchemaForLint = (schema: string): string => {
   const escaped = schema.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-  return `/* eslint-disable no-unused-vars */\nconst __PRISMA_SCHEMA__ = String.raw\`\n${escaped}\n\`\n;\nvoid __PRISMA_SCHEMA__;\n/* eslint-enable no-unused-vars */\n`;
+  return `const __PRISMA_SCHEMA__ = String.raw\`\n${escaped}\n\`\n;\nvoid __PRISMA_SCHEMA__;\n`;
 };
 
 export const extractPrismaSchemaFromSource = (sourceText: string): { schema: string; lineOffset: number } => {
@@ -86,6 +86,11 @@ export const extractPrismaSchemaFromSource = (sourceText: string): { schema: str
   if (!match) {
     return { schema: sourceText, lineOffset: 0 };
   }
+
+  const matchText = match[0];
+  const schemaIndex = matchText.indexOf(match[1]);
+  const prefix = schemaIndex === -1 ? '' : matchText.slice(0, schemaIndex);
+  const lineOffset = Math.max(0, prefix.split(/\r?\n/).length - 1);
 
   let schemaText = match[1];
   if (schemaText.startsWith('\n')) {
@@ -95,7 +100,10 @@ export const extractPrismaSchemaFromSource = (sourceText: string): { schema: str
     schemaText = schemaText.slice(0, -1);
   }
 
-  return { schema: schemaText.replace(/\\`/g, '`').replace(/\\\$\{/g, '${'), lineOffset: 0 };
+  return {
+    schema: schemaText.replace(/\\`/g, '`').replace(/\\\$\{/g, '${'),
+    lineOffset,
+  };
 };
 
 export const getDmmfFromSchema = (schema: string): DMMF.Document => {

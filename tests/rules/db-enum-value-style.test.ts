@@ -76,7 +76,7 @@ enum ExampleEnum {
     expect(messages).toHaveLength(1);
   });
 
-  it('preserves configured style label casing in messages', () => {
+  it('normalizes configured style labels in messages', () => {
     const messages = verify(
       `
 enum ExampleEnum {
@@ -86,7 +86,7 @@ enum ExampleEnum {
       { style: 'SnakeCase' },
     );
     expect(messages).toHaveLength(1);
-    expect(messages[0].message).toBe('Database enum values must follow the SnakeCase style.');
+    expect(messages[0].message).toBe('Database enum values must follow the snake_case style.');
   });
 
   it('accepts screaming_snake_case when configured', () => {

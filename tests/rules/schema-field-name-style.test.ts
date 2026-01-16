@@ -88,7 +88,7 @@ model ExampleModel {
     expect(messages[0].message).toBe('Schema field names must follow the camel_case style.');
   });
 
-  it('preserves configured style label casing in messages', () => {
+  it('normalizes configured style labels in messages', () => {
     const schema = `
 model ExampleModel {
   id String @id @map("id")
@@ -101,7 +101,7 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
-    expect(messages[0].message).toBe('Schema field names must follow the CamelCase style.');
+    expect(messages[0].message).toBe('Schema field names must follow the camel_case style.');
   });
 
   it('accepts pascal_case when configured', () => {
