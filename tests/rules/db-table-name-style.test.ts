@@ -18,6 +18,17 @@ generator client {
 }
 `;
 
+const applySuggestionFix = (
+  source: string,
+  suggestion: { fix?: { range: [number, number]; text: string } } | undefined,
+): string => {
+  if (!suggestion?.fix) {
+    throw new Error('Suggestion fix is missing.');
+  }
+  const [start, end] = suggestion.fix.range;
+  return `${source.slice(0, start)}${suggestion.fix.text}${source.slice(end)}`;
+};
+
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
@@ -87,6 +98,20 @@ model ExampleModel {
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
     expect(suggestion?.desc).toBe('Rename to "example_model"');
+  });
+
+  it('applies suggestion fixes to the original schema source', () => {
+    const schema = `
+model ExampleModel {
+  id String @id
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const messages = verify(schema);
+    const suggestion = messages[0]?.suggestions?.[0] as { fix?: { range: [number, number]; text: string } } | undefined;
+    const fixed = applySuggestionFix(source, suggestion);
+    expect(fixed).toContain('model example_model');
+    expect(fixed).not.toContain('model ExampleModel');
   });
 
   it('reports non-matching @@map value', () => {

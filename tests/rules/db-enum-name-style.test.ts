@@ -18,6 +18,17 @@ generator client {
 }
 `;
 
+const applySuggestionFix = (
+  source: string,
+  suggestion: { fix?: { range: [number, number]; text: string } } | undefined,
+): string => {
+  if (!suggestion?.fix) {
+    throw new Error('Suggestion fix is missing.');
+  }
+  const [start, end] = suggestion.fix.range;
+  return `${source.slice(0, start)}${suggestion.fix.text}${source.slice(end)}`;
+};
+
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
@@ -87,6 +98,20 @@ enum ExampleEnum {
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
     expect(suggestion?.desc).toBe('Rename to "example_enum"');
+  });
+
+  it('applies suggestion fixes to the original schema source', () => {
+    const schema = `
+enum ExampleEnum {
+  VALUE
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const messages = verify(schema);
+    const suggestion = messages[0]?.suggestions?.[0] as { fix?: { range: [number, number]; text: string } } | undefined;
+    const fixed = applySuggestionFix(source, suggestion);
+    expect(fixed).toContain('enum example_enum');
+    expect(fixed).not.toContain('enum ExampleEnum');
   });
 
   it('reports non-matching map values', () => {

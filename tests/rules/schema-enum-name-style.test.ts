@@ -18,6 +18,17 @@ generator client {
 }
 `;
 
+const applySuggestionFix = (
+  source: string,
+  suggestion: { fix?: { range: [number, number]; text: string } } | undefined,
+): string => {
+  if (!suggestion?.fix) {
+    throw new Error('Suggestion fix is missing.');
+  }
+  const [start, end] = suggestion.fix.range;
+  return `${source.slice(0, start)}${suggestion.fix.text}${source.slice(end)}`;
+};
+
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
@@ -78,6 +89,20 @@ enum example_enum {
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
     expect(suggestion?.desc).toBe('Rename to "ExampleEnum"');
+  });
+
+  it('applies suggestion fixes to the original schema source', () => {
+    const schema = `
+enum example_enum {
+  VALUE
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const messages = verify(schema);
+    const suggestion = messages[0]?.suggestions?.[0] as { fix?: { range: [number, number]; text: string } } | undefined;
+    const fixed = applySuggestionFix(source, suggestion);
+    expect(fixed).toContain('enum ExampleEnum');
+    expect(fixed).not.toContain('enum example_enum');
   });
 
   it('reports line and style for invalid enum names', () => {

@@ -50,11 +50,10 @@ export const schemaEnumNameStyle = createRule<Options, MessageIds>({
 
     const { style: styleInput } = context.options[0] ?? DEFAULT_OPTIONS[0];
     const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
-    const sourceText = context.getSourceCode().text;
 
     return {
       Program() {
-        const { dmmf, locator, lineOffset } = getPrismaSchemaContext(context.getSourceCode().text);
+        const { dmmf, locator, lineOffset, schema } = getPrismaSchemaContext(context.getSourceCode().text);
         const node = context.getSourceCode().ast;
 
         const reportEnum = (enumName: string) => {
@@ -65,7 +64,7 @@ export const schemaEnumNameStyle = createRule<Options, MessageIds>({
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
           const suggestedName = toNamingStyle(enumName, style);
-          const suggestionRange = getSourceRange(sourceText, offsetLocation, enumName.length);
+          const suggestionRange = getSourceRange(schema, location, enumName.length);
           context.report({
             node,
             loc: toReportLocation(offsetLocation),
