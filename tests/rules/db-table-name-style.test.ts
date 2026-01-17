@@ -86,7 +86,7 @@ model ExampleModel {
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "example_model".');
+    expect(suggestion?.desc).toBe('Rename to "example_model"');
   });
 
   it('reports non-matching @@map value', () => {

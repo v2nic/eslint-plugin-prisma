@@ -50,7 +50,7 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
     hasSuggestions: true,
     messages: {
       invalidFieldName: 'Schema field names must follow the {{style}} style.',
-      renameToStyle: 'Rename to "{{suggestion}}".',
+      renameToStyle: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

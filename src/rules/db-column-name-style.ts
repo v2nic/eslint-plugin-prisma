@@ -53,7 +53,7 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
     hasSuggestions: true,
     messages: {
       invalidColumnName: 'Database column names must follow the {{style}} style.',
-      renameToStyle: 'Rename to "{{suggestion}}".',
+      renameToStyle: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

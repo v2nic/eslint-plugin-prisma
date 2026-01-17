@@ -45,7 +45,7 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
     hasSuggestions: true,
     messages: {
       invalidModelName: 'Schema model names must follow the {{style}} style.',
-      renameToStyle: 'Rename to "{{suggestion}}".',
+      renameToStyle: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

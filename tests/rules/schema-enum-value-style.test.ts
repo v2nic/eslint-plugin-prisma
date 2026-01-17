@@ -66,7 +66,7 @@ enum ExampleEnum {
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "EXAMPLE_VALUE".');
+    expect(suggestion?.desc).toBe('Rename to "EXAMPLE_VALUE"');
   });
 
   it('normalizes configured style labels in messages', () => {

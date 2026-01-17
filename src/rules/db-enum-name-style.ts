@@ -40,7 +40,7 @@ export const dbEnumNameStyle = createRule<Options, MessageIds>({
     hasSuggestions: true,
     messages: {
       invalidEnumName: 'Database enum names must follow the {{style}} style.',
-      renameToStyle: 'Rename to "{{suggestion}}".',
+      renameToStyle: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

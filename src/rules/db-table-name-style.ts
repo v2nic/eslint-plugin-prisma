@@ -46,7 +46,7 @@ export const dbTableNameStyle = createRule<Options, MessageIds>({
     hasSuggestions: true,
     messages: {
       invalidTableName: 'Database table names must follow the {{style}} style.',
-      renameToStyle: 'Rename to "{{suggestion}}".',
+      renameToStyle: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

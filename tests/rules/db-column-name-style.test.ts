@@ -89,7 +89,7 @@ model ExampleModel {
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "example_field_id".');
+    expect(suggestion?.desc).toBe('Rename to "example_field_id"');
   });
 
   it('reports non-matching map values', () => {

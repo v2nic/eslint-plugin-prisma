@@ -72,8 +72,8 @@ export const noSnakeCaseInTs = createRule<Options, MessageIds>({
     ],
     hasSuggestions: true,
     messages: {
-      noSnakeCase: 'Do not introduce snake_case in TypeScript. Use camelCase in application code.',
-      renameToCamel: 'Rename to "{{suggestion}}".',
+      noSnakeCase: 'Identifiers in TypeScript should avoid snake_case.',
+      renameToCamel: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

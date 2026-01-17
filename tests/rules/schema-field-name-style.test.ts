@@ -75,12 +75,12 @@ model ExampleModel {
   it('suggests a rename for invalid field names', () => {
     const messages = verify(`
 model ExampleModel {
-  id String @id @map("id")
+  id String @id
   example_field_id String
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "exampleFieldId".');
+    expect(suggestion?.desc).toBe('Rename to "exampleFieldId"');
   });
 
   it('reports line and style for invalid field names', () => {

@@ -39,7 +39,7 @@ export const schemaEnumNameStyle = createRule<Options, MessageIds>({
     hasSuggestions: true,
     messages: {
       invalidEnumName: 'Schema enum names must follow the {{style}} style.',
-      renameToStyle: 'Rename to "{{suggestion}}".',
+      renameToStyle: 'Rename to "{{suggestion}}"',
     },
   },
   create(context) {

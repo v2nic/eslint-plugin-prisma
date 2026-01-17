@@ -86,7 +86,7 @@ enum ExampleEnum {
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "example_enum".');
+    expect(suggestion?.desc).toBe('Rename to "example_enum"');
   });
 
   it('reports non-matching map values', () => {

@@ -66,7 +66,7 @@ model example_model {
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "ExampleModel".');
+    expect(suggestion?.desc).toBe('Rename to "ExampleModel"');
   });
 
   it('accepts snake_case when configured', () => {

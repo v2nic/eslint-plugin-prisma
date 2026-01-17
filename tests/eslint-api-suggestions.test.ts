@@ -26,6 +26,6 @@ describe('eslint api suggestions', () => {
     const results = await eslint.lintText('const example_field_id = "123";');
     expect(results).toHaveLength(1);
     const [message] = results[0]?.messages ?? [];
-    expect(message?.suggestions?.[0]?.desc).toBe('Rename to "exampleFieldId".');
+    expect(message?.suggestions?.[0]?.desc).toBe('Rename to "exampleFieldId"');
   });
 });

@@ -77,7 +77,7 @@ enum example_enum {
 }
 `);
     const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
-    expect(suggestion?.desc).toBe('Rename to "ExampleEnum".');
+    expect(suggestion?.desc).toBe('Rename to "ExampleEnum"');
   });
 
   it('reports line and style for invalid enum names', () => {
