@@ -186,14 +186,18 @@ export const getDmmfFromSchema = (schema: string): DMMF.Document => {
   return JSON.parse(response) as DMMF.Document;
 };
 
-export const getPrismaSchemaContext = (sourceText: string): PrismaSchemaContext => {
+export const getPrismaSchemaContext = (sourceText: string): PrismaSchemaContext | null => {
   const { schema, lineOffset } = extractPrismaSchemaFromSource(sourceText);
-  return {
-    schema,
-    dmmf: getDmmfFromSchema(schema),
-    locator: buildSchemaLocator(schema),
-    lineOffset,
-  };
+  try {
+    return {
+      schema,
+      dmmf: getDmmfFromSchema(schema),
+      locator: buildSchemaLocator(schema),
+      lineOffset,
+    };
+  } catch {
+    return null;
+  }
 };
 
 export const buildSchemaLocator = (schema: string): SchemaLocator => {

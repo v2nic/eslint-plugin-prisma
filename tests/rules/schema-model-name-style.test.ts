@@ -131,4 +131,12 @@ model example_model {
     );
     expect(messages).toHaveLength(0);
   });
+
+  it('skips validation when schema parsing fails', () => {
+    const messages = verify(`
+model BrokenModel {
+  id String @id
+`);
+    expect(messages).toHaveLength(0);
+  });
 });

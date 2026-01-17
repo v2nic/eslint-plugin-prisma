@@ -58,7 +58,11 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
 
     return {
       Program() {
-        const { dmmf, locator, lineOffset, schema } = getPrismaSchemaContext(context.getSourceCode().text);
+        const schemaContext = getPrismaSchemaContext(context.getSourceCode().text);
+        if (!schemaContext) {
+          return;
+        }
+        const { dmmf, locator, lineOffset, schema } = schemaContext;
         const node = context.getSourceCode().ast;
 
         const reportModel = (modelName: string) => {
