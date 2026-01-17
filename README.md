@@ -2,6 +2,8 @@
 
 ESLint plugin ensuring best practices and code quality for Prisma with TypeScript
 
+[![npm version](https://img.shields.io/npm/v/@v2nic/eslint-plugin-prisma.svg)](https://www.npmjs.com/package/@v2nic/eslint-plugin-prisma)
+
 ## Overview
 
 This ESLint plugin is designed to help developers maintain best practices and enforce code quality when using Prisma in TypeScript projects. It includes a set of custom rules tailored to the specific requirements and idioms of Prisma, aiming to prevent common pitfalls and encourage efficient, clean, and secure database interactions.
