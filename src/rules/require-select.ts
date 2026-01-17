@@ -16,7 +16,6 @@ export const requireSelect = createRule<Options, MessageIds>({
     type: 'problem',
     docs: {
       description: 'Forces explicit selection of all fields in Prisma queries',
-      recommended: 'recommended',
     },
     schema: [
       {

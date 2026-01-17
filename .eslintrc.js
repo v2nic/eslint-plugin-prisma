@@ -72,13 +72,13 @@ module.exports = {
     {
       files: ['.eslint-doc-generatorrc.js'],
       rules: {
-        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-require-imports': 'off',
       },
     },
     {
       files: ['scripts/**/*.js'],
       rules: {
-        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-require-imports': 'off',
       },
     },
     {

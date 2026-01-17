@@ -20,6 +20,33 @@ Next, install `@v2nic/eslint-plugin-prisma`:
 npm install @v2nic/eslint-plugin-prisma --save-dev
 ```
 
+## Using the plugin from source
+
+If you want to use a local checkout instead of the registry, build the package and install it via a file path.
+
+```sh
+npm install
+npm run build
+```
+
+From the consuming project:
+
+```sh
+npm install /absolute/path/to/eslint-plugin-prisma --save-dev
+```
+
+If you update the plugin source, re-run `npm run build` in the plugin repo and reinstall. For local development, you can use `npm link` to create a global symlink to the package and then link it into your consuming project:
+
+```sh
+# in the plugin repo
+npm link
+
+# in the consuming repo
+npm link @v2nic/eslint-plugin-prisma
+```
+
+This makes Node resolve the plugin to your local checkout. The global link lives under your npm prefix (from `npm prefix -g`) at `lib/node_modules/@v2nic/eslint-plugin-prisma` (macOS/Linux) or `node_modules\@v2nic\eslint-plugin-prisma` (Windows). You still need to rebuild after changes (`npm run build`) because consumers load the compiled output. To stop using the linked package, run `npm unlink --no-save @v2nic/eslint-plugin-prisma` in the consuming repo and `npm unlink` in the plugin repo.
+
 ## Usage
 
 Example failure for schema field naming:

@@ -14,7 +14,6 @@ export const noUnsafe = createRule<Options, MessageIds>({
     type: 'problem',
     docs: {
       description: 'Disallow the use of potentially unsafe Prisma methods',
-      recommended: 'recommended',
     },
     schema: [
       {

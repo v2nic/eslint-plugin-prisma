@@ -1,11 +1,14 @@
+import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noUnsafe } from '../../src/rules/no-unsafe';
 
 const ruleTester = new RuleTester({
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname + '/../test-project',
+  languageOptions: {
+    parser,
+    parserOptions: {
+      project: './tsconfig.json',
+      tsconfigRootDir: __dirname + '/../test-project',
+    },
   },
 });
 
