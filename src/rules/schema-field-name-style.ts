@@ -61,11 +61,10 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
 
     const { style: styleInput, allowlist = [], ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
     const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
-    const sourceText = context.getSourceCode().text;
 
     return {
       Program() {
-        const { dmmf, locator, lineOffset } = getPrismaSchemaContext(context.getSourceCode().text);
+        const { dmmf, locator, lineOffset, schema } = getPrismaSchemaContext(context.getSourceCode().text);
         const node = context.getSourceCode().ast;
 
         const reportField = (modelName: string, fieldName: string) => {
@@ -76,7 +75,7 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
           const suggestedName = toNamingStyle(fieldName, style);
-          const suggestionRange = getSourceRange(sourceText, offsetLocation, fieldName.length);
+          const suggestionRange = getSourceRange(schema, location, fieldName.length);
           context.report({
             node,
             loc: {
