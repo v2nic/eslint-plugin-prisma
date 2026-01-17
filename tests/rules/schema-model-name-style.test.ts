@@ -32,6 +32,17 @@ const applySuggestionFix = (
 const preprocess = (code: string) => [wrapPrismaSchemaForLint(code)];
 const postprocess = (messages: Array<Array<unknown>>) => messages.flat();
 
+const findLineColumn = (source: string, marker: string): { line: number; column: number } => {
+  const lines = source.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index += 1) {
+    const columnIndex = lines[index].indexOf(marker);
+    if (columnIndex !== -1) {
+      return { line: index + 1, column: columnIndex + 1 };
+    }
+  }
+  throw new Error(`Marker not found: ${marker}`);
+};
+
 const verify = (schema: string, options?: { style?: string }) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
@@ -68,6 +79,21 @@ model example_model {
 `);
     expect(messages).toHaveLength(1);
     expect(messages[0].ruleId).toBe('prisma/schema-model-name-style');
+  });
+
+  it('reports full range for invalid model names', () => {
+    const schema = `
+model example_model {
+  id String @id
+}
+`;
+    const source = `${SCHEMA_HEADER}\n${schema}`;
+    const location = findLineColumn(source, 'example_model');
+    const messages = verify(schema);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].line).toBe(location.line);
+    expect(messages[0].column).toBe(location.column);
+    expect(messages[0].endColumn).toBe(location.column + 'example_model'.length);
   });
 
   it('suggests a rename for invalid model names', () => {

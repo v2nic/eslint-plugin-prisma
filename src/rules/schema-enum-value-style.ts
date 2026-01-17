@@ -6,7 +6,6 @@ import {
   isNamingStyle,
   resolveNamingStyle,
   toNamingStyle,
-  toReportLocation,
 } from '../utils/prisma-schema';
 
 type Options = [{ style?: string }?];
@@ -67,7 +66,13 @@ export const schemaEnumValueStyle = createRule<Options, MessageIds>({
           const suggestionRange = getSourceRange(schema, location, valueName.length);
           context.report({
             node,
-            loc: toReportLocation(offsetLocation),
+            loc: {
+              start: offsetLocation,
+              end: {
+                line: offsetLocation.line,
+                column: offsetLocation.column + valueName.length,
+              },
+            },
             messageId: 'invalidEnumValue',
             data: { style: styleLabel },
             suggest: [

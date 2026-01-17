@@ -6,7 +6,6 @@ import {
   isNamingStyle,
   resolveNamingStyle,
   toNamingStyle,
-  toReportLocation,
 } from '../utils/prisma-schema';
 
 type Options = [{ style?: string; ignoreModels?: readonly string[] }?];
@@ -73,7 +72,13 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
           const suggestionRange = getSourceRange(schema, location, modelName.length);
           context.report({
             node,
-            loc: toReportLocation(offsetLocation),
+            loc: {
+              start: offsetLocation,
+              end: {
+                line: offsetLocation.line,
+                column: offsetLocation.column + modelName.length,
+              },
+            },
             messageId: 'invalidModelName',
             data: { style: styleLabel },
             suggest: [

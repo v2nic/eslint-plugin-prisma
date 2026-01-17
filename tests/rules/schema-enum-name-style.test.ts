@@ -117,6 +117,7 @@ enum example_enum {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
+    expect(messages[0].endColumn).toBe(location.column + 'example_enum'.length);
     expect(messages[0].message).toBe('Schema enum names must follow the PascalCase style.');
   });
 
@@ -132,6 +133,7 @@ enum ExampleEnum {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
+    expect(messages[0].endColumn).toBe(location.column + 'ExampleEnum'.length);
     expect(messages[0].message).toBe('Schema enum names must follow the snake_case style.');
   });
 
