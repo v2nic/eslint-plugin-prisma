@@ -12,5 +12,5 @@ export const prismaSchemaProcessor: Processor.ProcessorModule = {
   postprocess(messages) {
     return messages.flat();
   },
-  supportsAutofix: false,
+  supportsAutofix: true,
 };
