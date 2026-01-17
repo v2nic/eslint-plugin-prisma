@@ -2,13 +2,13 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  globals: {
-    'ts-jest': {
-      tsconfig: {
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.json',
         isolatedModules: true,
-        module: 'Node16',
-        moduleResolution: 'Node16',
       },
-    },
+    ],
   },
 };
