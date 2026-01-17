@@ -72,6 +72,17 @@ model ExampleModel {
     expect(messages[0].ruleId).toBe('prisma/schema-field-name-style');
   });
 
+  it('suggests a rename for invalid field names', () => {
+    const messages = verify(`
+model ExampleModel {
+  id String @id @map("id")
+  example_field_id String
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "exampleFieldId".');
+  });
+
   it('reports line and style for invalid field names', () => {
     const schema = `
 model ExampleModel {
@@ -85,6 +96,7 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
     expect(messages[0].line).toBe(location.line);
     expect(messages[0].column).toBe(location.column);
+    expect(messages[0].endColumn).toBe(location.column + 'example_field_id'.length);
     expect(messages[0].message).toBe('Schema field names must follow the camelCase style.');
   });
 

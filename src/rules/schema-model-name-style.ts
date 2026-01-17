@@ -2,14 +2,16 @@ import { createRule } from '../utils/create-rule';
 import {
   applyLineOffset,
   getPrismaSchemaContext,
+  getSourceRange,
   isNamingStyle,
   resolveNamingStyle,
+  toNamingStyle,
   toReportLocation,
 } from '../utils/prisma-schema';
 
 type Options = [{ style?: string; ignoreModels?: readonly string[] }?];
 
-type MessageIds = 'invalidModelName';
+type MessageIds = 'invalidModelName' | 'renameToStyle';
 
 const DEFAULT_OPTIONS = [{ style: 'pascal_case', ignoreModels: [] }] as const;
 
@@ -40,8 +42,10 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
         additionalProperties: false,
       },
     ],
+    hasSuggestions: true,
     messages: {
       invalidModelName: 'Schema model names must follow the {{style}} style.',
+      renameToStyle: 'Rename to "{{suggestion}}".',
     },
   },
   create(context) {
@@ -52,6 +56,7 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
 
     const { style: styleInput, ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
     const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
+    const sourceText = context.getSourceCode().text;
 
     return {
       Program() {
@@ -65,11 +70,20 @@ export const schemaModelNameStyle = createRule<Options, MessageIds>({
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
+          const suggestedName = toNamingStyle(modelName, style);
+          const suggestionRange = getSourceRange(sourceText, offsetLocation, modelName.length);
           context.report({
             node,
             loc: toReportLocation(offsetLocation),
             messageId: 'invalidModelName',
             data: { style: styleLabel },
+            suggest: [
+              {
+                messageId: 'renameToStyle',
+                data: { suggestion: suggestedName },
+                fix: (fixer) => fixer.replaceTextRange(suggestionRange, suggestedName),
+              },
+            ],
           });
         };
 

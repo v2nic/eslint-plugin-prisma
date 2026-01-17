@@ -70,6 +70,16 @@ enum example_enum {
     expect(messages[0].ruleId).toBe('prisma/schema-enum-name-style');
   });
 
+  it('suggests a rename for invalid enum names', () => {
+    const messages = verify(`
+enum example_enum {
+  VALUE
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "ExampleEnum".');
+  });
+
   it('reports line and style for invalid enum names', () => {
     const schema = `
 enum example_enum {

@@ -59,6 +59,16 @@ model example_model {
     expect(messages[0].ruleId).toBe('prisma/schema-model-name-style');
   });
 
+  it('suggests a rename for invalid model names', () => {
+    const messages = verify(`
+model example_model {
+  id String @id
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "ExampleModel".');
+  });
+
   it('accepts snake_case when configured', () => {
     const messages = verify(
       `

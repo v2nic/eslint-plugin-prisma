@@ -1,5 +1,7 @@
 # Disallow snake_case identifiers and keys in TypeScript (`@v2nic/prisma/no-snake-case-in-ts`)
 
+💡 This rule is manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
+
 <!-- end auto-generated rule header -->
 
 ## Purpose

@@ -37,17 +37,47 @@ ruleTester.run('no-snake-case-in-ts', noSnakeCaseInTs, {
     {
       code: 'const example_field_id = "123";',
       filename: 'src/server/example.ts',
-      errors: [{ messageId: 'noSnakeCase' }],
+      errors: [
+        {
+          messageId: 'noSnakeCase',
+          suggestions: [
+            {
+              messageId: 'renameToCamel',
+              output: 'const exampleFieldId = "123";',
+            },
+          ],
+        },
+      ],
     },
     {
       code: 'const x = { example_field_id: "123" };',
       filename: 'src/server/example.ts',
-      errors: [{ messageId: 'noSnakeCase' }],
+      errors: [
+        {
+          messageId: 'noSnakeCase',
+          suggestions: [
+            {
+              messageId: 'renameToCamel',
+              output: 'const x = { exampleFieldId: "123" };',
+            },
+          ],
+        },
+      ],
     },
     {
       code: 'const x = { "example_field_id": "123" };',
       filename: 'src/server/example.ts',
-      errors: [{ messageId: 'noSnakeCase' }],
+      errors: [
+        {
+          messageId: 'noSnakeCase',
+          suggestions: [
+            {
+              messageId: 'renameToCamel',
+              output: 'const x = { "exampleFieldId": "123" };',
+            },
+          ],
+        },
+      ],
     },
   ],
 });

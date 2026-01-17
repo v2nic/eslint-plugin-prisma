@@ -2,14 +2,17 @@ import { createRule } from '../utils/create-rule';
 import {
   applyLineOffset,
   getPrismaSchemaContext,
+  getMapValueRange,
+  getSourceRange,
   isNamingStyle,
   resolveNamingStyle,
+  toNamingStyle,
   toReportLocation,
 } from '../utils/prisma-schema';
 
 type Options = [{ style?: string; allowlist?: readonly string[]; ignoreModels?: readonly string[] }?];
 
-type MessageIds = 'invalidColumnName';
+type MessageIds = 'invalidColumnName' | 'renameToStyle';
 
 const DEFAULT_OPTIONS = [{ style: 'snake_case', allowlist: [], ignoreModels: [] }] as const;
 
@@ -47,8 +50,10 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
         additionalProperties: false,
       },
     ],
+    hasSuggestions: true,
     messages: {
       invalidColumnName: 'Database column names must follow the {{style}} style.',
+      renameToStyle: 'Rename to "{{suggestion}}".',
     },
   },
   create(context) {
@@ -59,26 +64,46 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
 
     const { style: styleInput, allowlist = [], ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
     const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
+    const sourceText = context.getSourceCode().text;
 
     return {
       Program() {
         const { dmmf, locator, lineOffset } = getPrismaSchemaContext(context.getSourceCode().text);
         const node = context.getSourceCode().ast;
 
-        const reportField = (modelName: string, fieldName: string, preferMap: boolean) => {
+        const reportField = (modelName: string, fieldName: string, mapValue: string | undefined) => {
           const mapLocation = locator.modelFieldMapLocations.get(modelName)?.get(fieldName);
           const nameLocation = locator.modelFieldLocations.get(modelName)?.get(fieldName);
+          const preferMap = Boolean(mapValue);
           const location = preferMap ? mapLocation ?? nameLocation : nameLocation ?? mapLocation;
           if (!location) {
             context.report({ node, messageId: 'invalidColumnName', data: { style: styleLabel } });
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
+          const suggestedName = toNamingStyle(mapValue ?? fieldName, style);
+          let suggestionRange: [number, number] | null = null;
+          if (mapValue && mapLocation) {
+            const offsetMapLocation = applyLineOffset(mapLocation, lineOffset);
+            suggestionRange = getMapValueRange(sourceText, offsetMapLocation.line);
+          } else if (!mapValue && nameLocation) {
+            const offsetNameLocation = applyLineOffset(nameLocation, lineOffset);
+            suggestionRange = getSourceRange(sourceText, offsetNameLocation, fieldName.length);
+          }
           context.report({
             node,
             loc: toReportLocation(offsetLocation),
             messageId: 'invalidColumnName',
             data: { style: styleLabel },
+            suggest: suggestionRange
+              ? [
+                  {
+                    messageId: 'renameToStyle',
+                    data: { suggestion: suggestedName },
+                    fix: (fixer) => fixer.replaceTextRange(suggestionRange, suggestedName),
+                  },
+                ]
+              : undefined,
           });
         };
 
@@ -96,7 +121,7 @@ export const dbColumnNameStyle = createRule<Options, MessageIds>({
             const mapValue = locator.modelFieldMapValues.get(model.name)?.get(field.name);
             const effectiveName = mapValue ?? field.name;
             if (!isNamingStyle(effectiveName, style)) {
-              reportField(model.name, field.name, Boolean(mapValue));
+              reportField(model.name, field.name, mapValue);
             }
           });
         });

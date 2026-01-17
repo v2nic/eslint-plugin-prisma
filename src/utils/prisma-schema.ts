@@ -51,6 +51,17 @@ const NAMING_STYLE_LABELS: Record<NamingStyle, string> = {
   screaming_snake_case: 'SCREAMING_SNAKE_CASE',
 };
 
+const splitWords = (value: string): string[] => {
+  const normalized = value
+    .replace(/[_\s]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z0-9]+)/g, '$1 $2');
+  return normalized
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
+};
+
 const normalizeNamingStyleKey = (style: string): string => style.replace(/_/g, '').toLowerCase();
 
 export const resolveNamingStyle = (
@@ -73,6 +84,27 @@ export const resolveNamingStyle = (
   return { style, styleLabel: NAMING_STYLE_LABELS[style] };
 };
 
+export const toNamingStyle = (value: string, style: NamingStyle): string => {
+  const words = splitWords(value);
+  switch (style) {
+    case 'snake_case':
+      return words.map((word) => word.toLowerCase()).join('_');
+    case 'camel_case':
+      return words
+        .map((word, index) => {
+          if (index === 0) {
+            return word.toLowerCase();
+          }
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join('');
+    case 'pascal_case':
+      return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('');
+    case 'screaming_snake_case':
+      return words.map((word) => word.toUpperCase()).join('_');
+  }
+};
+
 export const toReportLocation = (location: SourceLocation): ReportLocation => ({
   start: location,
   end: { line: location.line, column: location.column + 1 },
@@ -82,6 +114,41 @@ export const applyLineOffset = (location: SourceLocation, lineOffset: number): S
   line: location.line + lineOffset,
   column: location.column,
 });
+
+const getLineStartIndices = (sourceText: string): number[] => {
+  const indices = [0];
+  for (let index = 0; index < sourceText.length; index += 1) {
+    if (sourceText[index] === '\n') {
+      indices.push(index + 1);
+    }
+  }
+  return indices;
+};
+
+export const getLineInfo = (sourceText: string, line: number): { lineStart: number; lineText: string } => {
+  const lineStarts = getLineStartIndices(sourceText);
+  const lineStart = lineStarts[line - 1] ?? sourceText.length;
+  const lineEnd = lineStarts[line] ? lineStarts[line] - 1 : sourceText.length;
+  const lineText = sourceText.slice(lineStart, lineEnd);
+  return { lineStart, lineText };
+};
+
+export const getSourceRange = (sourceText: string, location: SourceLocation, length: number): [number, number] => {
+  const { lineStart } = getLineInfo(sourceText, location.line);
+  const start = lineStart + location.column;
+  return [start, start + length];
+};
+
+export const getMapValueRange = (sourceText: string, line: number): [number, number] | null => {
+  const { lineStart, lineText } = getLineInfo(sourceText, line);
+  const match = lineText.match(/@{1,2}map\("([^"]*)"\)/);
+  if (!match || match.index === undefined) {
+    return null;
+  }
+  const quoteStart = match.index + match[0].indexOf('"') + 1;
+  const start = lineStart + quoteStart;
+  return [start, start + match[1].length];
+};
 
 export const wrapPrismaSchemaForLint = (schema: string): string => {
   const escaped = schema.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');

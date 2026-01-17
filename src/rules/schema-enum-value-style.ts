@@ -2,14 +2,16 @@ import { createRule } from '../utils/create-rule';
 import {
   applyLineOffset,
   getPrismaSchemaContext,
+  getSourceRange,
   isNamingStyle,
   resolveNamingStyle,
+  toNamingStyle,
   toReportLocation,
 } from '../utils/prisma-schema';
 
 type Options = [{ style?: string }?];
 
-type MessageIds = 'invalidEnumValue';
+type MessageIds = 'invalidEnumValue' | 'renameToStyle';
 
 const DEFAULT_OPTIONS = [{ style: 'screaming_snake_case' }] as const;
 
@@ -34,8 +36,10 @@ export const schemaEnumValueStyle = createRule<Options, MessageIds>({
         additionalProperties: false,
       },
     ],
+    hasSuggestions: true,
     messages: {
       invalidEnumValue: 'Schema enum values must follow the {{style}} style.',
+      renameToStyle: 'Rename to "{{suggestion}}".',
     },
   },
   create(context) {
@@ -46,6 +50,7 @@ export const schemaEnumValueStyle = createRule<Options, MessageIds>({
 
     const { style: styleInput } = context.options[0] ?? DEFAULT_OPTIONS[0];
     const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
+    const sourceText = context.getSourceCode().text;
 
     return {
       Program() {
@@ -59,11 +64,20 @@ export const schemaEnumValueStyle = createRule<Options, MessageIds>({
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
+          const suggestedName = toNamingStyle(valueName, style);
+          const suggestionRange = getSourceRange(sourceText, offsetLocation, valueName.length);
           context.report({
             node,
             loc: toReportLocation(offsetLocation),
             messageId: 'invalidEnumValue',
             data: { style: styleLabel },
+            suggest: [
+              {
+                messageId: 'renameToStyle',
+                data: { suggestion: suggestedName },
+                fix: (fixer) => fixer.replaceTextRange(suggestionRange, suggestedName),
+              },
+            ],
           });
         };
 

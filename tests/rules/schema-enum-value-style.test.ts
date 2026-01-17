@@ -59,6 +59,16 @@ enum ExampleEnum {
     expect(messages[0].ruleId).toBe('prisma/schema-enum-value-style');
   });
 
+  it('suggests a rename for invalid enum values', () => {
+    const messages = verify(`
+enum ExampleEnum {
+  example_value
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "EXAMPLE_VALUE".');
+  });
+
   it('normalizes configured style labels in messages', () => {
     const messages = verify(
       `

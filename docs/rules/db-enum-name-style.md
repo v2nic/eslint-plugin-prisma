@@ -1,5 +1,7 @@
 # Enforce database enum names to follow the configured style (`@v2nic/prisma/db-enum-name-style`)
 
+💡 This rule is manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
+
 <!-- end auto-generated rule header -->
 
 ## Options

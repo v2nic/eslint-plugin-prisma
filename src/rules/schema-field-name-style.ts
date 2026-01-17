@@ -2,14 +2,15 @@ import { createRule } from '../utils/create-rule';
 import {
   applyLineOffset,
   getPrismaSchemaContext,
+  getSourceRange,
   isNamingStyle,
   resolveNamingStyle,
-  toReportLocation,
+  toNamingStyle,
 } from '../utils/prisma-schema';
 
 type Options = [{ style?: string; allowlist?: readonly string[]; ignoreModels?: readonly string[] }?];
 
-type MessageIds = 'invalidFieldName';
+type MessageIds = 'invalidFieldName' | 'renameToStyle';
 
 const DEFAULT_OPTIONS = [{ style: 'camel_case', allowlist: [], ignoreModels: [] }] as const;
 
@@ -46,8 +47,10 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
         additionalProperties: false,
       },
     ],
+    hasSuggestions: true,
     messages: {
       invalidFieldName: 'Schema field names must follow the {{style}} style.',
+      renameToStyle: 'Rename to "{{suggestion}}".',
     },
   },
   create(context) {
@@ -58,6 +61,7 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
 
     const { style: styleInput, allowlist = [], ignoreModels = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
     const { style, styleLabel } = resolveNamingStyle(styleInput, DEFAULT_OPTIONS[0].style);
+    const sourceText = context.getSourceCode().text;
 
     return {
       Program() {
@@ -71,11 +75,26 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
             return;
           }
           const offsetLocation = applyLineOffset(location, lineOffset);
+          const suggestedName = toNamingStyle(fieldName, style);
+          const suggestionRange = getSourceRange(sourceText, offsetLocation, fieldName.length);
           context.report({
             node,
-            loc: toReportLocation(offsetLocation),
+            loc: {
+              start: offsetLocation,
+              end: {
+                line: offsetLocation.line,
+                column: offsetLocation.column + fieldName.length,
+              },
+            },
             messageId: 'invalidFieldName',
             data: { style: styleLabel },
+            suggest: [
+              {
+                messageId: 'renameToStyle',
+                data: { suggestion: suggestedName },
+                fix: (fixer) => fixer.replaceTextRange(suggestionRange, suggestedName),
+              },
+            ],
           });
         };
 

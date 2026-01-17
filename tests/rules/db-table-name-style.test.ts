@@ -79,6 +79,16 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
   });
 
+  it('suggests a rename for invalid table names', () => {
+    const messages = verify(`
+model ExampleModel {
+  id String @id
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "example_model".');
+  });
+
   it('reports non-matching @@map value', () => {
     const messages = verify(`
 model ExampleModel {

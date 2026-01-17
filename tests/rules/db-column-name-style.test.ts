@@ -81,6 +81,17 @@ model ExampleModel {
     expect(messages).toHaveLength(1);
   });
 
+  it('suggests a rename for invalid column names', () => {
+    const messages = verify(`
+model ExampleModel {
+  id String @id
+  exampleFieldId String
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "example_field_id".');
+  });
+
   it('reports non-matching map values', () => {
     const messages = verify(`
 model ExampleModel {

@@ -79,6 +79,16 @@ enum ExampleEnum {
     expect(messages).toHaveLength(1);
   });
 
+  it('suggests a rename for invalid enum names', () => {
+    const messages = verify(`
+enum ExampleEnum {
+  VALUE
+}
+`);
+    const suggestion = messages[0]?.suggestions?.[0] as { desc?: string } | undefined;
+    expect(suggestion?.desc).toBe('Rename to "example_enum".');
+  });
+
   it('reports non-matching map values', () => {
     const messages = verify(`
 enum ExampleEnum {

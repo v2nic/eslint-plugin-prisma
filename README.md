@@ -65,6 +65,16 @@ schema.prisma
   3:3  error  Schema field names must follow the camelCase style  prisma/schema-field-name-style
 ```
 
+### VS Code ESLint validation
+
+The VS Code ESLint extension only validates language IDs listed in `eslint.validate`. ESLint config does not control this. Add Prisma to your workspace or user settings to enable linting in `.prisma` files:
+
+```json
+{
+  "eslint.validate": ["javascript", "typescript", "prisma"]
+}
+```
+
 ### ESLint flat config
 
 Use the processor object and plugin map. This complete example shows both overrides:
@@ -183,16 +193,16 @@ The rules table is generated from each rule definition. The 💡 marker means th
 
 | Name                                                             | Description                                                          | 💡  |
 | :--------------------------------------------------------------- | :------------------------------------------------------------------- | :-- |
-| [db-column-name-style](docs/rules/db-column-name-style.md)       | Enforce database column names to follow the configured style         |     |
-| [db-enum-name-style](docs/rules/db-enum-name-style.md)           | Enforce database enum names to follow the configured style           |     |
-| [db-enum-value-style](docs/rules/db-enum-value-style.md)         | Enforce database enum values to follow the configured style          |     |
-| [db-table-name-style](docs/rules/db-table-name-style.md)         | Enforce database table names to follow the configured style          |     |
-| [no-snake-case-in-ts](docs/rules/no-snake-case-in-ts.md)         | Disallow snake_case identifiers and keys in TypeScript               |     |
+| [db-column-name-style](docs/rules/db-column-name-style.md)       | Enforce database column names to follow the configured style         | 💡  |
+| [db-enum-name-style](docs/rules/db-enum-name-style.md)           | Enforce database enum names to follow the configured style           | 💡  |
+| [db-enum-value-style](docs/rules/db-enum-value-style.md)         | Enforce database enum values to follow the configured style          | 💡  |
+| [db-table-name-style](docs/rules/db-table-name-style.md)         | Enforce database table names to follow the configured style          | 💡  |
+| [no-snake-case-in-ts](docs/rules/no-snake-case-in-ts.md)         | Disallow snake_case identifiers and keys in TypeScript               | 💡  |
 | [no-unsafe](docs/rules/no-unsafe.md)                             | Disallow the use of potentially unsafe Prisma methods                |     |
 | [require-select](docs/rules/require-select.md)                   | Forces explicit selection of all fields in Prisma queries            | 💡  |
-| [schema-enum-name-style](docs/rules/schema-enum-name-style.md)   | Enforce schema enum names to follow the configured TypeScript style  |     |
-| [schema-enum-value-style](docs/rules/schema-enum-value-style.md) | Enforce schema enum values to follow the configured TypeScript style |     |
-| [schema-field-name-style](docs/rules/schema-field-name-style.md) | Enforce schema field names to follow the configured TypeScript style |     |
-| [schema-model-name-style](docs/rules/schema-model-name-style.md) | Enforce schema model names to follow the configured TypeScript style |     |
+| [schema-enum-name-style](docs/rules/schema-enum-name-style.md)   | Enforce schema enum names to follow the configured TypeScript style  | 💡  |
+| [schema-enum-value-style](docs/rules/schema-enum-value-style.md) | Enforce schema enum values to follow the configured TypeScript style | 💡  |
+| [schema-field-name-style](docs/rules/schema-field-name-style.md) | Enforce schema field names to follow the configured TypeScript style | 💡  |
+| [schema-model-name-style](docs/rules/schema-model-name-style.md) | Enforce schema model names to follow the configured TypeScript style | 💡  |
 
 <!-- end auto-generated rules list -->
