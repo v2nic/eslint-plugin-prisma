@@ -3,10 +3,6 @@ import { dbTableNameStyle } from '../../src/rules/db-table-name-style';
 import { wrapPrismaSchemaForLint } from '../../src/utils/prisma-schema';
 
 const linter = new Linter();
-(linter as unknown as { defineRule: (...args: unknown[]) => void }).defineRule(
-  'prisma/db-table-name-style',
-  dbTableNameStyle as unknown,
-);
 
 const SCHEMA_HEADER = `
 datasource db {
@@ -47,10 +43,18 @@ const verify = (schema: string, options?: { style?: string; ignoreModels?: strin
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {
+      files: ["**/*.prisma"],
+      plugins: {
+        prisma: {
+          rules: {
+            'db-table-name-style': dbTableNameStyle,
+          },
+        },
+      },
       rules: {
         'prisma/db-table-name-style': ['error', options ?? {}],
       },
-      parserOptions: {
+      languageOptions: {
         ecmaVersion: 2020,
       },
     },

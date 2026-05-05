@@ -44,7 +44,7 @@ export const dbEnumNameStyle = createRule<Options, MessageIds>({
     },
   },
   create(context) {
-    const filename = context.getFilename();
+    const filename = context.filename;
     if (!filename.endsWith('.prisma') && !filename.includes('.prisma')) {
       return {};
     }
@@ -54,12 +54,12 @@ export const dbEnumNameStyle = createRule<Options, MessageIds>({
 
     return {
       Program() {
-        const schemaContext = getPrismaSchemaContext(context.getSourceCode().text);
+        const schemaContext = getPrismaSchemaContext(context.sourceCode.text);
         if (!schemaContext) {
           return;
         }
         const { dmmf, locator, lineOffset, schema } = schemaContext;
-        const node = context.getSourceCode().ast;
+        const node = context.sourceCode.ast;
 
         const reportEnum = (enumName: string, mapValue: string | undefined) => {
           const mapLocation = locator.enumMapLocations.get(enumName);
