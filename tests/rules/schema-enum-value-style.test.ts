@@ -3,10 +3,6 @@ import { schemaEnumValueStyle } from '../../src/rules/schema-enum-value-style';
 import { wrapPrismaSchemaForLint } from '../../src/utils/prisma-schema';
 
 const linter = new Linter();
-(linter as unknown as { defineRule: (...args: unknown[]) => void }).defineRule(
-  'prisma/schema-enum-value-style',
-  schemaEnumValueStyle as unknown,
-);
 
 const SCHEMA_HEADER = `
 datasource db {
@@ -47,10 +43,18 @@ const verify = (schema: string, options?: { style?: string }) =>
   (linter as unknown as { verify: (...args: unknown[]) => ReturnType<Linter['verify']> }).verify(
     `${SCHEMA_HEADER}\n${schema}`,
     {
+      files: ["**/*.prisma"],
+      plugins: {
+        prisma: {
+          rules: {
+            'schema-enum-value-style': schemaEnumValueStyle,
+          },
+        },
+      },
       rules: {
         'prisma/schema-enum-value-style': ['error', options ?? {}],
       },
-      parserOptions: {
+      languageOptions: {
         ecmaVersion: 2020,
       },
     },

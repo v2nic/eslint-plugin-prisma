@@ -54,7 +54,7 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
     },
   },
   create(context) {
-    const filename = context.getFilename();
+    const filename = context.filename;
     if (!filename.endsWith('.prisma') && !filename.includes('.prisma')) {
       return {};
     }
@@ -64,12 +64,12 @@ export const schemaFieldNameStyle = createRule<Options, MessageIds>({
 
     return {
       Program() {
-        const schemaContext = getPrismaSchemaContext(context.getSourceCode().text);
+        const schemaContext = getPrismaSchemaContext(context.sourceCode.text);
         if (!schemaContext) {
           return;
         }
         const { dmmf, locator, lineOffset, schema } = schemaContext;
-        const node = context.getSourceCode().ast;
+        const node = context.sourceCode.ast;
 
         const reportField = (modelName: string, fieldName: string) => {
           const location = locator.modelFieldLocations.get(modelName)?.get(fieldName);

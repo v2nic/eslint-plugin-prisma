@@ -77,9 +77,9 @@ export const noSnakeCaseInTs = createRule<Options, MessageIds>({
     },
   },
   create(context) {
-    const filename = context.getFilename();
+    const filename = context.filename;
     const { allowedSnakeCaseKeys = [], allowedFileGlobs = [] } = context.options[0] ?? DEFAULT_OPTIONS[0];
-    const sourceCode = context.getSourceCode();
+    const sourceCode = context.sourceCode;
 
     if (isAllowedFile(filename, allowedFileGlobs)) {
       return {};
